@@ -15,7 +15,7 @@ from PyQt6.QtGui import QFont, QKeySequence, QShortcut
 from PyQt6.QtWidgets import (
     QComboBox, QDialog, QFileDialog, QFrame, QGridLayout, QHBoxLayout,
     QInputDialog, QLabel, QLineEdit, QMessageBox, QPlainTextEdit,
-    QScrollArea, QSplitter, QVBoxLayout, QWidget,
+    QPushButton, QScrollArea, QSplitter, QTextEdit, QVBoxLayout, QWidget,
 )
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 
@@ -38,6 +38,7 @@ from app.widgets import (
     make_separator,
 )
 from app.data import add_category as data_add_category
+from app import git_ops
 
 
 # ═════════════════════════════════════════════════════════════
@@ -127,6 +128,7 @@ class DashboardView(QWidget):
         qa.addWidget(_qa_btn("\uff0b  Add Doc", "Add a new doc", self.request_add_doc.emit))
         qa.addWidget(_qa_btn("\u270e  Editor", "Markdown editor", lambda: self.navigate_to.emit(3)))
         qa.addWidget(_qa_btn("\u2630  Categories", "Manage categories", lambda: self.navigate_to.emit(2)))
+        qa.addWidget(_qa_btn("\u2191  Publish", "Sync & publish", lambda: self.navigate_to.emit(4)))
         qw = QWidget()
         qw.setLayout(qa)
         lay.addWidget(qw)
@@ -986,3 +988,317 @@ class MarkdownEditorView(QWidget):
             self.doc_saved.emit()
         except Exception as e:
             QMessageBox.critical(self, "Save Error", str(e))
+
+
+# ═════════════════════════════════════════════════════════════
+#  5. GIT SYNC / PUBLISH VIEW
+# ═════════════════════════════════════════════════════════════
+
+_STATUS_SYMBOL = {
+    "M": ("\u25cf", "#f59e0b"),   # modified  — amber dot
+    "A": ("\u25cf", "#34d399"),   # added     — green dot
+    "D": ("\u25cf", "#f87171"),   # deleted   — red dot
+    "?": ("\u25cb", "#94a3b8"),   # untracked — grey circle
+    "R": ("\u25cf", "#818cf8"),   # renamed   — indigo dot
+}
+
+
+class GitSyncView(QWidget):
+    """
+    Publish / Sync panel.
+
+    • Shows current branch, remote URL, and number of uncommitted changes.
+    • “Sync from GitHub” — git pull
+    • “Publish to GitHub” — git add -A → commit → push
+    All git operations run on a background thread; output streams into
+    the log area in real time.
+    """
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self._thread = None
+        self._build()
+
+    # ── Construction ────────────────────────────────────
+    def _build(self):
+        root = QVBoxLayout(self)
+        root.setContentsMargins(20, 16, 20, 20)
+        root.setSpacing(14)
+
+        # ── Status card ────────────────────────────────
+        root.addWidget(label("Repository Status", "sectionHead"))
+
+        self._status_card = QFrame()
+        self._status_card.setObjectName("statCard")
+        sc_lay = QVBoxLayout(self._status_card)
+        sc_lay.setContentsMargins(14, 12, 14, 12)
+        sc_lay.setSpacing(6)
+
+        self._branch_lbl = QLabel("Branch: —")
+        self._branch_lbl.setStyleSheet(f"font-size: 12px; color: {TEXT};")
+        sc_lay.addWidget(self._branch_lbl)
+
+        self._remote_lbl = QLabel("Remote: —")
+        self._remote_lbl.setStyleSheet(f"font-size: 11px; color: {TEXT_DIM};")
+        self._remote_lbl.setWordWrap(True)
+        sc_lay.addWidget(self._remote_lbl)
+
+        self._changes_lbl = QLabel("Changes: —")
+        self._changes_lbl.setStyleSheet(f"font-size: 12px; color: {TEXT};")
+        sc_lay.addWidget(self._changes_lbl)
+
+        self._unpushed_lbl = QLabel("Unpushed commits: —")
+        self._unpushed_lbl.setStyleSheet(f"font-size: 12px; color: {TEXT};")
+        sc_lay.addWidget(self._unpushed_lbl)
+
+        root.addWidget(self._status_card)
+
+        # ── Changed files list ──────────────────────────
+        self._files_header = label("Changed Files", "sectionHead")
+        root.addWidget(self._files_header)
+
+        self._files_scroll = QScrollArea()
+        self._files_scroll.setWidgetResizable(True)
+        self._files_scroll.setMaximumHeight(140)
+        self._files_scroll.setStyleSheet(
+            f"QScrollArea {{ background: {BG_CARD}; border: 1px solid {BORDER};"
+            f"border-radius: 8px; }}"
+        )
+        self._files_inner = QWidget()
+        self._files_layout = QVBoxLayout(self._files_inner)
+        self._files_layout.setContentsMargins(10, 8, 10, 8)
+        self._files_layout.setSpacing(3)
+        self._files_scroll.setWidget(self._files_inner)
+        root.addWidget(self._files_scroll)
+
+        # ── Commit message ──────────────────────────────
+        root.addWidget(label("Commit Message", "sectionHead"))
+        self._msg_input = QLineEdit()
+        self._msg_input.setPlaceholderText(
+            "Describe your changes (e.g. \'Add Python 3.14 docs\')"
+        )
+        self._msg_input.setStyleSheet(
+            f"background: {BG_CARD}; border: 1px solid {BORDER};"
+            f"border-radius: 6px; padding: 8px 10px;"
+            f"font-size: 12px; color: {TEXT};"
+        )
+        root.addWidget(self._msg_input)
+
+        # ── Action buttons ──────────────────────────────
+        btn_row = QHBoxLayout()
+        btn_row.setSpacing(10)
+
+        self._sync_btn = self._make_action_btn(
+            "\u21d3  Sync from GitHub",
+            "#06b6d4",
+            self._do_pull,
+        )
+        self._publish_btn = self._make_action_btn(
+            "\u2191  Publish to GitHub",
+            ACCENT,
+            self._do_push,
+        )
+        self._refresh_btn = self._make_action_btn(
+            "\u21bb  Refresh Status",
+            "#64748b",
+            self.refresh,
+        )
+        btn_row.addWidget(self._sync_btn)
+        btn_row.addWidget(self._publish_btn)
+        btn_row.addWidget(self._refresh_btn)
+        bw = QWidget()
+        bw.setLayout(btn_row)
+        root.addWidget(bw)
+
+        # ── Output log ──────────────────────────────────
+        root.addWidget(label("Output", "sectionHead"))
+        self._log = QPlainTextEdit()
+        self._log.setReadOnly(True)
+        self._log.setPlaceholderText("Git output will appear here…")
+        self._log.setStyleSheet(
+            f"QPlainTextEdit {{"
+            f"  background: #0d1117; color: #c9d1d9;"
+            f"  border: 1px solid {BORDER}; border-radius: 8px;"
+            f"  font-family: 'Cascadia Code', 'Consolas', monospace;"
+            f"  font-size: 11px; padding: 8px;"
+            f"}}"
+        )
+        self._log.setMinimumHeight(120)
+        root.addWidget(self._log, 1)
+
+        self._no_git_banner = QLabel(
+            "\u26a0  This folder is not a Git repository.\n"
+            "Initialise one (`git init`) and add a remote to enable publishing."
+        )
+        self._no_git_banner.setWordWrap(True)
+        self._no_git_banner.setStyleSheet(
+            f"background: #1c1917; color: #fbbf24; border: 1px solid #78350f;"
+            f"border-radius: 8px; padding: 12px; font-size: 12px;"
+        )
+        self._no_git_banner.hide()
+        root.addWidget(self._no_git_banner)
+
+        self.refresh()
+
+    # ── Public ──────────────────────────────────────────
+    def refresh(self):
+        """Re-read git state and update all status labels."""
+        if not git_ops.is_git_repo():
+            self._set_git_available(False)
+            return
+        self._set_git_available(True)
+
+        branch = git_ops.get_branch()
+        remote = git_ops.get_remote_url()
+        status_lines = git_ops.get_status_lines()
+        unpushed = git_ops.get_unpushed_count()
+
+        self._branch_lbl.setText(
+            f"Branch:  <b>{branch}</b>" if branch else "Branch: (detached HEAD)"
+        )
+        self._branch_lbl.setTextFormat(Qt.TextFormat.RichText)
+
+        self._remote_lbl.setText(
+            f"Remote:  {remote}" if remote else "Remote:  (none configured)"
+        )
+
+        n = len(status_lines)
+        if n == 0:
+            self._changes_lbl.setText("Changes:  up to date")
+            self._changes_lbl.setStyleSheet(
+                f"font-size: 12px; color: {TEXT_FAINT};"
+            )
+        else:
+            self._changes_lbl.setText(f"Changes:  {n} file{'s' if n != 1 else ''} modified")
+            self._changes_lbl.setStyleSheet(
+                f"font-size: 12px; color: #f59e0b; font-weight: 600;"
+            )
+
+        unpushed_text = (
+            f"Unpushed commits:  {unpushed}" if unpushed
+            else "Unpushed commits:  none"
+        )
+        self._unpushed_lbl.setText(unpushed_text)
+        self._unpushed_lbl.setStyleSheet(
+            f"font-size: 12px; color: {'#34d399' if unpushed else TEXT_FAINT};"
+        )
+
+        # Rebuild files list
+        while self._files_layout.count():
+            item = self._files_layout.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+
+        if status_lines:
+            for line in status_lines:
+                xy = line[:2].strip()
+                path = line[3:].strip()
+                letter = xy[-1] if xy else "?"
+                sym, color = _STATUS_SYMBOL.get(letter, ("\u25cf", TEXT_DIM))
+                row = QHBoxLayout()
+                row.setSpacing(6)
+                dot = QLabel(sym)
+                dot.setFixedWidth(14)
+                dot.setStyleSheet(f"color: {color}; font-size: 13px;")
+                row.addWidget(dot)
+                row.addWidget(label(path, size=11))
+                row.addStretch()
+                badge = QLabel(xy or "?")
+                badge.setStyleSheet(
+                    f"color: {color}; font-size: 10px; font-family: monospace;"
+                )
+                row.addWidget(badge)
+                rw = QWidget()
+                rw.setLayout(row)
+                self._files_layout.addWidget(rw)
+        else:
+            self._files_layout.addWidget(
+                label("No uncommitted changes.", "faintLabel")
+            )
+
+        self._files_inner.adjustSize()
+
+    # ── Private helpers ──────────────────────────────────
+    def _set_git_available(self, available: bool):
+        self._status_card.setVisible(available)
+        self._files_header.setVisible(available)
+        self._files_scroll.setVisible(available)
+        self._msg_input.setVisible(available)
+        self._sync_btn.setVisible(available)
+        self._publish_btn.setVisible(available)
+        self._no_git_banner.setVisible(not available)
+
+    def _make_action_btn(self, text: str, color: str, slot) -> QPushButton:
+        from PyQt6.QtWidgets import QPushButton
+        b = QPushButton(text)
+        b.setCursor(Qt.CursorShape.PointingHandCursor)
+        b.setStyleSheet(
+            f"QPushButton {{ background: {color}; color: #fff; border: none;"
+            f"border-radius: 6px; padding: 9px 16px; font-size: 12px;"
+            f"font-weight: 600; }}"
+            f"QPushButton:hover {{ opacity: 0.9; }}"
+            f"QPushButton:disabled {{ background: {BG_CARD}; color: {TEXT_FAINT}; }}"
+        )
+        b.clicked.connect(slot)
+        return b
+
+    def _set_busy(self, busy: bool):
+        self._sync_btn.setEnabled(not busy)
+        self._publish_btn.setEnabled(not busy)
+        self._refresh_btn.setEnabled(not busy)
+        self._msg_input.setEnabled(not busy)
+
+    def _log_line(self, line: str):
+        self._log.appendPlainText(line)
+        self._log.verticalScrollBar().setValue(
+            self._log.verticalScrollBar().maximum()
+        )
+
+    def _on_succeeded(self):
+        self._log_line("\n\u2713 Done.")
+        self._set_busy(False)
+        self.refresh()
+
+    def _on_failed(self, msg: str):
+        self._log_line(f"\n\u2717 Failed: {msg}")
+        self._set_busy(False)
+        self.refresh()
+
+    # ── Git actions ──────────────────────────────────────
+    def _do_pull(self):
+        self._log.clear()
+        self._log_line("Syncing from GitHub…")
+        self._set_busy(True)
+        self._thread = git_ops.GitCommandThread([["pull"]])
+        self._thread.output.connect(self._log_line)
+        self._thread.succeeded.connect(self._on_succeeded)
+        self._thread.failed.connect(self._on_failed)
+        self._thread.start()
+
+    def _do_push(self):
+        msg = self._msg_input.text().strip()
+        if not msg:
+            QMessageBox.warning(
+                self, "Commit Message Required",
+                "Please enter a commit message before publishing.",
+            )
+            self._msg_input.setFocus()
+            return
+
+        self._log.clear()
+        self._log_line("Publishing to GitHub…")
+        self._set_busy(True)
+        branch = git_ops.get_branch() or "main"
+        self._thread = git_ops.GitCommandThread([
+            ["add", "-A"],
+            ["commit", "-m", msg],
+            ["push", "origin", branch],
+        ])
+        self._thread.output.connect(self._log_line)
+        self._thread.succeeded.connect(self._on_push_succeeded)
+        self._thread.failed.connect(self._on_failed)
+        self._thread.start()
+
+    def _on_push_succeeded(self):
+        self._msg_input.clear()
+        self._on_succeeded()

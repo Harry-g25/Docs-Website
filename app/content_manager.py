@@ -11,10 +11,11 @@ from PyQt6.QtWidgets import (
 from app.config import ACCENT, BG_DARK, BG_PANEL, BORDER, TEXT, TEXT_DIM
 from app.styles import CM_PANEL_SS
 from app.views import (
-    CategoryManagerView, DashboardView, DocsListView, MarkdownEditorView,
+    CategoryManagerView, DashboardView, DocsListView, GitSyncView,
+    MarkdownEditorView,
 )
 
-_TABS = ["Dashboard", "Documents", "Categories", "Editor"]
+_TABS = ["Dashboard", "Documents", "Categories", "Editor", "Publish"]
 
 
 class ContentManager(QWidget):
@@ -93,11 +94,13 @@ class ContentManager(QWidget):
         self.docs_list = DocsListView()
         self.cat_manager = CategoryManagerView()
         self.editor = MarkdownEditorView()
+        self.git_sync = GitSyncView()
 
         self._stack.addWidget(self.dashboard)
         self._stack.addWidget(self.docs_list)
         self._stack.addWidget(self.cat_manager)
         self._stack.addWidget(self.editor)
+        self._stack.addWidget(self.git_sync)
         outer.addWidget(self._stack, 1)
 
         # Wire signals

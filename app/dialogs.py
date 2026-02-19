@@ -1,6 +1,7 @@
 """
 Dialog windows for the Documentation Hub.
 
+  • CMLoginDialog — password gate for the Content Manager
   • AddDocWizard — full wizard for adding a new doc to the hub
   • EditDocDialog — edit doc title, version, description, tags, colors
   • MoveDocDialog — move doc to a different category
@@ -12,6 +13,7 @@ import os
 import re
 import shutil
 
+from PyQt6.QtCore import Qt, QSettings
 from PyQt6.QtGui import QColor
 from PyQt6.QtWidgets import (
     QColorDialog, QComboBox, QDialog, QFileDialog, QFormLayout,
@@ -21,7 +23,7 @@ from PyQt6.QtWidgets import (
 
 from app.config import (
     ACCENT, BG_DARK, BG_PANEL, CONTENT_DIR, INDEX_HTML, PAGES_DIR,
-    TEXT, TEXT_DIM,
+    SETTINGS_APP, SETTINGS_ORG, TEXT, TEXT_DIM,
 )
 from app.data import atomic_write, cached_categories, log_activity
 from app.icons import CARD_ICONS, SECTION_ICONS
@@ -40,6 +42,153 @@ from app.site_engine import (
 )
 from app.styles import DIALOG_SS
 from app.widgets import btn
+
+
+# ═════════════════════════════════════════════════════════════
+#  Content Manager Login Dialog
+# ═════════════════════════════════════════════════════════════
+
+class CMLoginDialog(QDialog):
+    """Password gate for opening the Content Manager."""
+
+    _SETTINGS_KEY = "cm_password"
+    _DEFAULT_PASSWORD = "admin"
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Content Manager — Login")
+        self.setFixedWidth(320)
+        self.setStyleSheet(DIALOG_SS)
+        self._settings = QSettings(SETTINGS_ORG, SETTINGS_APP)
+        self._build()
+
+    def _build(self):
+        lay = QVBoxLayout(self)
+        lay.setContentsMargins(24, 20, 24, 20)
+        lay.setSpacing(12)
+
+        title = QLabel("Content Manager")
+        title.setStyleSheet(
+            f"font-size: 15px; font-weight: 700; color: {TEXT};"
+        )
+        lay.addWidget(title)
+
+        sub = QLabel("Enter password to continue")
+        sub.setStyleSheet(f"font-size: 12px; color: {TEXT_DIM};")
+        lay.addWidget(sub)
+
+        lay.addSpacing(4)
+
+        self._pw_input = QLineEdit()
+        self._pw_input.setPlaceholderText("Password")
+        self._pw_input.setEchoMode(QLineEdit.EchoMode.Password)
+        self._pw_input.returnPressed.connect(self._attempt_login)
+        lay.addWidget(self._pw_input)
+
+        self._error_label = QLabel("")
+        self._error_label.setStyleSheet("font-size: 11px; color: #f87171;")
+        lay.addWidget(self._error_label)
+
+        login_btn = QPushButton("Login")
+        login_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        login_btn.setStyleSheet(
+            f"QPushButton {{ background: {ACCENT}; color: #fff; border: none;"
+            f"border-radius: 6px; padding: 8px 16px; font-weight: 600; }}"
+            f"QPushButton:hover {{ background: #818cf8; }}"
+        )
+        login_btn.clicked.connect(self._attempt_login)
+        lay.addWidget(login_btn)
+
+        lay.addSpacing(4)
+
+        change_pw_btn = QPushButton("Change password\u2026")
+        change_pw_btn.setFlat(True)
+        change_pw_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        change_pw_btn.setStyleSheet(
+            f"QPushButton {{ background: transparent; border: none;"
+            f"color: {TEXT_DIM}; font-size: 11px; text-decoration: underline;"
+            f"padding: 0; }}"
+            f"QPushButton:hover {{ color: {TEXT}; }}"
+        )
+        change_pw_btn.clicked.connect(self._change_password)
+        lay.addWidget(change_pw_btn, alignment=Qt.AlignmentFlag.AlignLeft)
+
+    def _stored_password(self) -> str:
+        return self._settings.value(self._SETTINGS_KEY, self._DEFAULT_PASSWORD)
+
+    def _attempt_login(self):
+        if self._pw_input.text() == self._stored_password():
+            self.accept()
+        else:
+            self._error_label.setText("Incorrect password.")
+            self._pw_input.clear()
+            self._pw_input.setFocus()
+
+    def _change_password(self):
+        if self._pw_input.text() != self._stored_password():
+            QMessageBox.warning(
+                self, "Authentication Required",
+                "Enter the correct current password first.",
+            )
+            return
+        dlg = _ChangePasswordDialog(self)
+        if dlg.exec() == QDialog.DialogCode.Accepted:
+            self._settings.setValue(self._SETTINGS_KEY, dlg.new_password)
+            QMessageBox.information(self, "Password Changed", "Password updated successfully.")
+
+
+class _ChangePasswordDialog(QDialog):
+    """Helper dialog for changing the Content Manager password."""
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Change Password")
+        self.setFixedWidth(300)
+        self.setStyleSheet(DIALOG_SS)
+        self.new_password = ""
+        self._build()
+
+    def _build(self):
+        lay = QVBoxLayout(self)
+        lay.setContentsMargins(20, 16, 20, 16)
+        lay.setSpacing(10)
+
+        lay.addWidget(QLabel("New password:"))
+        self._new_pw = QLineEdit()
+        self._new_pw.setEchoMode(QLineEdit.EchoMode.Password)
+        lay.addWidget(self._new_pw)
+
+        lay.addWidget(QLabel("Confirm password:"))
+        self._confirm_pw = QLineEdit()
+        self._confirm_pw.setEchoMode(QLineEdit.EchoMode.Password)
+        self._confirm_pw.returnPressed.connect(self._confirm)
+        lay.addWidget(self._confirm_pw)
+
+        self._err = QLabel("")
+        self._err.setStyleSheet("color: #f87171; font-size: 11px;")
+        lay.addWidget(self._err)
+
+        ok_btn = QPushButton("Set Password")
+        ok_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        ok_btn.setStyleSheet(
+            f"QPushButton {{ background: {ACCENT}; color: #fff; border: none;"
+            f"border-radius: 6px; padding: 8px 16px; font-weight: 600; }}"
+            f"QPushButton:hover {{ background: #818cf8; }}"
+        )
+        ok_btn.clicked.connect(self._confirm)
+        lay.addWidget(ok_btn)
+
+    def _confirm(self):
+        new = self._new_pw.text()
+        confirm = self._confirm_pw.text()
+        if not new:
+            self._err.setText("Password cannot be empty.")
+            return
+        if new != confirm:
+            self._err.setText("Passwords do not match.")
+            return
+        self.new_password = new
+        self.accept()
 
 
 # ═════════════════════════════════════════════════════════════

@@ -23,7 +23,7 @@ from app.icons import (
 )
 from app.styles import MAIN_WINDOW_SS, FIND_BAR_SS
 from app.content_manager import ContentManager
-from app.dialogs import AddDocWizard
+from app.dialogs import AddDocWizard, CMLoginDialog
 
 
 # ── Find-in-page bar ───────────────────────────────────
@@ -199,10 +199,6 @@ class DocsBrowser(QMainWindow):
         self.home_action.setToolTip("Documentation Hub  (Alt+Home)")
         self.home_action.triggered.connect(self._go_home)
 
-        self.add_action = tb.addAction(add_icon, "Add Doc")
-        self.add_action.setToolTip("Add new documentation  (Ctrl+N)")
-        self.add_action.triggered.connect(self._open_add_wizard)
-
         spacer = QWidget()
         spacer.setSizePolicy(
             QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred,
@@ -227,7 +223,6 @@ class DocsBrowser(QMainWindow):
         QShortcut(QKeySequence("Alt+Left"), self, activated=self.web.back)
         QShortcut(QKeySequence("Alt+Right"), self, activated=self.web.forward)
         QShortcut(QKeySequence("Alt+Home"), self, activated=self._go_home)
-        QShortcut(QKeySequence("Ctrl+N"), self, activated=self._open_add_wizard)
         QShortcut(QKeySequence("Ctrl+M"), self, activated=self._toggle_cm)
         QShortcut(QKeySequence("Ctrl+Q"), self, activated=self._quit)
 
@@ -275,6 +270,9 @@ class DocsBrowser(QMainWindow):
             self._open_cm()
 
     def _open_cm(self):
+        dlg = CMLoginDialog(self)
+        if dlg.exec() != CMLoginDialog.DialogCode.Accepted:
+            return
         self.content_manager.show()
         saved = self._settings.value("splitter_sizes")
         if saved:
