@@ -1,0 +1,109 @@
+{
+  "docs": [
+    {
+      "slug": "python-3.14",
+      "title": "Python 3.14",
+      "version": "v3.14",
+      "description": "Comprehensive learning guide and reference for Python 3.14. Covers beginner fundamentals through advanced topics like concurrency, typing, and performance.",
+      "color1": "#306998",
+      "color2": "#4584b6",
+      "tags": [
+        "Beginner",
+        "Intermediate",
+        "Advanced",
+        "Learning"
+      ],
+      "category_id": "python",
+      "category_name": "Python"
+    },
+    {
+      "slug": "customtkinter",
+      "title": "CustomTkinter",
+      "version": "v5.2.2",
+      "description": "Modern, fully customizable Python desktop UI library built on top of Tkinter. Create beautiful apps with light/dark mode, high-DPI scaling, and consistent cross-platform appearance.",
+      "color1": "#6366f1",
+      "color2": "#818cf8",
+      "tags": [
+        "GUI",
+        "Desktop",
+        "Widgets",
+        "Theming"
+      ],
+      "category_id": "python",
+      "category_name": "Python"
+    },
+    {
+      "slug": "reportlab",
+      "title": "ReportLab",
+      "version": "v4.2",
+      "description": "The powerful open-source PDF generation library for Python. Create complex, data-driven PDF documents with tables, charts, images, barcodes, and precise page layouts.",
+      "color1": "#ef4444",
+      "color2": "#f97316",
+      "tags": [
+        "PDF",
+        "Reports",
+        "Charts",
+        "Tables"
+      ],
+      "category_id": "python",
+      "category_name": "Python"
+    },
+    {
+      "slug": "html-complete-reference-practical-guide",
+      "title": "HTML Complete Reference & Practical Guide",
+      "version": "vV.1.0",
+      "description": "HTML Docs",
+      "color1": "#6366f1",
+      "color2": "#818cf8",
+      "tags": [
+        "Web Development"
+      ],
+      "category_id": "web",
+      "category_name": "Web"
+    },
+    {
+      "slug": "css-complete-reference-practical-guide",
+      "title": "CSS Complete Reference & Practical Guide",
+      "version": "v1.0",
+      "description": "A comprehensive reference guide to CSS covering selectors, the cascade, layout, flexbox, grid, typography, transitions, animations, and responsive design.",
+      "color1": "#264de4",
+      "color2": "#2965f1",
+      "tags": [
+        "CSS",
+        "Layout",
+        "Flexbox",
+        "Grid",
+        "Responsive"
+      ],
+      "category_id": "web",
+      "category_name": "Web"
+    }
+  ],
+  "categories": [
+    {
+      "id": "python",
+      "name": "Python",
+      "description": "Language guides, desktop UI, PDF generation, and more",
+      "color1": "#306998",
+      "color2": "#FFD43B",
+      "doc_count": 3
+    },
+    {
+      "id": "web",
+      "name": "Web Development",
+      "description": "Frontend frameworks, CSS, APIs, and deployment",
+      "color1": "#06b6d4",
+      "color2": "#3b82f6",
+      "doc_count": 2
+    },
+    {
+      "id": "data",
+      "name": "Data & Databases",
+      "description": "SQL, data analysis, pandas, and storage solutions",
+      "color1": "#10b981",
+      "color2": "#34d399",
+      "doc_count": 0
+    }
+  ],
+  "synced": "2026-02-19T01:32:30.506907+00:00"
+}

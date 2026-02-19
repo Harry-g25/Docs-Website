@@ -1,0 +1,34 @@
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editor / IDE
+.vscode/
+*.swp
+*.swo
+*~
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.env
+venv/
+.venv/
+
+# Logs & temp files
+*.log
+*.tmp
+*.bak
+*.bak2
+output.txt
+
+# Activity log (generated at runtime)
+.activity_log.json
+
+# Trash (content manager soft-deletes)
+.trash/
+
+# Editor autosave files
+*.autosave
