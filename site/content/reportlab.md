@@ -225,6 +225,27 @@ ReportLab is the **industry-standard open-source PDF generation library** for Py
 
 ---
 
+## How to Use This Guide
+
+This guide mixes two kinds of code blocks:
+
+- **Runnable examples** (full scripts) — these have an **Output** section underneath, including an embedded PDF preview when the code generates a PDF.
+- **Snippets** (API fragments) — these illustrate one concept and may omit setup (e.g. `c = canvas.Canvas(...)`). Snippets usually won’t have an output preview.
+
+> **About the previews:** the PDFs you see embedded in this page are **pre-generated** from the runnable examples, so you can learn visually without running anything.
+
+### Debugging Toolkit (Read This When Something Looks “Wrong”)
+
+If your generated PDF is blank / missing content / misaligned, check these first:
+
+- **Did you call `save()` / `build()`?** Canvas requires `c.save()`. Platypus requires `doc.build(story)`.
+- **Are you drawing off-page?** PDF origin is bottom-left; `y` increases upward.
+- **Units:** coordinates are in points (1 inch = 72 points). Mixing `cm`/`inch` with raw numbers is a common source of layout drift.
+- **Paths & state:** if you use `saveState()`, always pair it with `restoreState()`.
+- **Platypus layout:** enable `showBoundary=1` to see frames and margins when debugging.
+
+---
+
 ## Installation & Setup
 
 ### Basic Installation
@@ -255,6 +276,11 @@ print(reportlab.Version)
 # Output: 4.2
 ```
 
+Output:
+```output
+4.2
+```
+
 Test that PDF generation works:
 
 ```python
@@ -265,6 +291,22 @@ c.drawString(100, 750, "ReportLab is working!")
 c.save()
 print("✓ test.pdf created successfully")
 ```
+
+Output:
+```output
+✓ test.pdf created successfully
+```
+
+- Download: [test.pdf](../assets/reportlab/test.pdf)
+
+<details>
+<summary>Preview (PDF)</summary>
+
+<object data="../assets/reportlab/test.pdf" type="application/pdf" style="width:100%;height:600px;border:1px solid var(--border);border-radius:10px;background:var(--code-bg)">
+    <p>Your browser can’t preview PDFs here. Download instead: <a href="../assets/reportlab/test.pdf">test.pdf</a></p>
+</object>
+
+</details>
 
 ### Optional Dependencies
 
@@ -334,6 +376,31 @@ c.save()
 print("hello.pdf created!")
 ```
 
+Output:
+```output
+hello.pdf created!
+```
+
+- Download: [hello.pdf](../assets/reportlab/hello.pdf)
+
+<details>
+<summary>Preview (PDF)</summary>
+
+<object data="../assets/reportlab/hello.pdf" type="application/pdf" style="width:100%;height:600px;border:1px solid var(--border);border-radius:10px;background:var(--code-bg)">
+    <p>Your browser can’t preview PDFs here. Download instead: <a href="../assets/reportlab/hello.pdf">hello.pdf</a></p>
+</object>
+
+</details>
+
+<details>
+<summary>Try it (quick exercise)</summary>
+
+- Change the page size to `LETTER` and notice how the available drawing area changes.
+- Add a second page with `c.showPage()` and draw a different heading on page 2.
+- Move the rectangle to the top of the page by using `height - y` style calculations.
+
+</details>
+
 ### Understanding the Coordinate System
 
 ReportLab uses a **bottom-left origin** coordinate system, just like PostScript and PDF natively:
@@ -378,6 +445,17 @@ c.drawString(100, 700, "Text on page 2")
 # Finalize and save
 c.save()
 ```
+
+- Download: [output.pdf](../assets/reportlab/output.pdf)
+
+<details>
+<summary>Preview (PDF)</summary>
+
+<object data="../assets/reportlab/output.pdf" type="application/pdf" style="width:100%;height:600px;border:1px solid var(--border);border-radius:10px;background:var(--code-bg)">
+    <p>Your browser can’t preview PDFs here. Download instead: <a href="../assets/reportlab/output.pdf">output.pdf</a></p>
+</object>
+
+</details>
 
 **Canvas Constructor Arguments:**
 
@@ -468,6 +546,17 @@ c.drawString(100, 670, "Back to defaults")
 c.save()
 ```
 
+- Download: [state_demo.pdf](../assets/reportlab/state_demo.pdf)
+
+<details>
+<summary>Preview (PDF)</summary>
+
+<object data="../assets/reportlab/state_demo.pdf" type="application/pdf" style="width:100%;height:600px;border:1px solid var(--border);border-radius:10px;background:var(--code-bg)">
+    <p>Your browser can’t preview PDFs here. Download instead: <a href="../assets/reportlab/state_demo.pdf">state_demo.pdf</a></p>
+</object>
+
+</details>
+
 > **Important:** Always pair `saveState()` with `restoreState()`. Unmatched calls will cause errors.
 
 ### Canvas vs Platypus
@@ -526,6 +615,17 @@ for font in fonts:
 c.save()
 ```
 
+- Download: [text_demo.pdf](../assets/reportlab/text_demo.pdf)
+
+<details>
+<summary>Preview (PDF)</summary>
+
+<object data="../assets/reportlab/text_demo.pdf" type="application/pdf" style="width:100%;height:600px;border:1px solid var(--border);border-radius:10px;background:var(--code-bg)">
+    <p>Your browser can’t preview PDFs here. Download instead: <a href="../assets/reportlab/text_demo.pdf">text_demo.pdf</a></p>
+</object>
+
+</details>
+
 ### Drawing Lines & Shapes
 
 ```python
@@ -565,6 +665,17 @@ c.drawPath(path)
 c.save()
 ```
 
+- Download: [shapes_demo.pdf](../assets/reportlab/shapes_demo.pdf)
+
+<details>
+<summary>Preview (PDF)</summary>
+
+<object data="../assets/reportlab/shapes_demo.pdf" type="application/pdf" style="width:100%;height:600px;border:1px solid var(--border);border-radius:10px;background:var(--code-bg)">
+    <p>Your browser can’t preview PDFs here. Download instead: <a href="../assets/reportlab/shapes_demo.pdf">shapes_demo.pdf</a></p>
+</object>
+
+</details>
+
 ### Drawing Rectangles & Rounded Rectangles
 
 ```python
@@ -596,6 +707,17 @@ c.roundRect(12*cm, h - 10*cm, 6*cm, 3*cm, radius=15, fill=1, stroke=0)
 c.save()
 ```
 
+- Download: [rectangles.pdf](../assets/reportlab/rectangles.pdf)
+
+<details>
+<summary>Preview (PDF)</summary>
+
+<object data="../assets/reportlab/rectangles.pdf" type="application/pdf" style="width:100%;height:600px;border:1px solid var(--border);border-radius:10px;background:var(--code-bg)">
+    <p>Your browser can’t preview PDFs here. Download instead: <a href="../assets/reportlab/rectangles.pdf">rectangles.pdf</a></p>
+</object>
+
+</details>
+
 ### Drawing Circles & Ellipses
 
 ```python
@@ -623,6 +745,17 @@ c.wedge(3*cm, h - 14*cm, 9*cm, h - 8*cm, startAng=0, extent=120, fill=1)
 
 c.save()
 ```
+
+- Download: [circles.pdf](../assets/reportlab/circles.pdf)
+
+<details>
+<summary>Preview (PDF)</summary>
+
+<object data="../assets/reportlab/circles.pdf" type="application/pdf" style="width:100%;height:600px;border:1px solid var(--border);border-radius:10px;background:var(--code-bg)">
+    <p>Your browser can’t preview PDFs here. Download instead: <a href="../assets/reportlab/circles.pdf">circles.pdf</a></p>
+</object>
+
+</details>
 
 ### Drawing Paths
 
@@ -677,6 +810,17 @@ c.drawPath(p3)
 c.save()
 ```
 
+- Download: [paths.pdf](../assets/reportlab/paths.pdf)
+
+<details>
+<summary>Preview (PDF)</summary>
+
+<object data="../assets/reportlab/paths.pdf" type="application/pdf" style="width:100%;height:600px;border:1px solid var(--border);border-radius:10px;background:var(--code-bg)">
+    <p>Your browser can’t preview PDFs here. Download instead: <a href="../assets/reportlab/paths.pdf">paths.pdf</a></p>
+</object>
+
+</details>
+
 ### Fill & Stroke Colors
 
 ```python
@@ -719,6 +863,17 @@ c.rect(72, h - 220, 200, 40, fill=1)
 
 c.save()
 ```
+
+- Download: [colors_demo.pdf](../assets/reportlab/colors_demo.pdf)
+
+<details>
+<summary>Preview (PDF)</summary>
+
+<object data="../assets/reportlab/colors_demo.pdf" type="application/pdf" style="width:100%;height:600px;border:1px solid var(--border);border-radius:10px;background:var(--code-bg)">
+    <p>Your browser can’t preview PDFs here. Download instead: <a href="../assets/reportlab/colors_demo.pdf">colors_demo.pdf</a></p>
+</object>
+
+</details>
 
 ### Line Styles & Dash Patterns
 
@@ -802,6 +957,17 @@ c.drawString(x1, h - 535, "Bevel join (2)")
 c.save()
 ```
 
+- Download: [line_styles.pdf](../assets/reportlab/line_styles.pdf)
+
+<details>
+<summary>Preview (PDF)</summary>
+
+<object data="../assets/reportlab/line_styles.pdf" type="application/pdf" style="width:100%;height:600px;border:1px solid var(--border);border-radius:10px;background:var(--code-bg)">
+    <p>Your browser can’t preview PDFs here. Download instead: <a href="../assets/reportlab/line_styles.pdf">line_styles.pdf</a></p>
+</object>
+
+</details>
+
 ### Canvas Transformations
 
 ```python
@@ -846,6 +1012,17 @@ c.restoreState()
 c.save()
 ```
 
+- Download: [transforms.pdf](../assets/reportlab/transforms.pdf)
+
+<details>
+<summary>Preview (PDF)</summary>
+
+<object data="../assets/reportlab/transforms.pdf" type="application/pdf" style="width:100%;height:600px;border:1px solid var(--border);border-radius:10px;background:var(--code-bg)">
+    <p>Your browser can’t preview PDFs here. Download instead: <a href="../assets/reportlab/transforms.pdf">transforms.pdf</a></p>
+</object>
+
+</details>
+
 ### Clipping
 
 ```python
@@ -875,6 +1052,17 @@ c.restoreState()
 c.save()
 ```
 
+- Download: [clipping.pdf](../assets/reportlab/clipping.pdf)
+
+<details>
+<summary>Preview (PDF)</summary>
+
+<object data="../assets/reportlab/clipping.pdf" type="application/pdf" style="width:100%;height:600px;border:1px solid var(--border);border-radius:10px;background:var(--code-bg)">
+    <p>Your browser can’t preview PDFs here. Download instead: <a href="../assets/reportlab/clipping.pdf">clipping.pdf</a></p>
+</object>
+
+</details>
+
 ### Multiple Pages
 
 ```python
@@ -902,6 +1090,21 @@ c.save()
 print("multipage.pdf created with 5 pages")
 ```
 
+```output
+multipage.pdf created with 5 pages
+```
+
+- Download: [multipage.pdf](../assets/reportlab/multipage.pdf)
+
+<details>
+<summary>Preview (PDF)</summary>
+
+<object data="../assets/reportlab/multipage.pdf" type="application/pdf" style="width:100%;height:600px;border:1px solid var(--border);border-radius:10px;background:var(--code-bg)">
+    <p>Your browser can’t preview PDFs here. Download instead: <a href="../assets/reportlab/multipage.pdf">multipage.pdf</a></p>
+</object>
+
+</details>
+
 ---
 
 ## Working with Text
@@ -927,6 +1130,17 @@ c.drawRightString(w - 72, h - 148, "This is drawRightString (right)")
 
 c.save()
 ```
+
+- Download: [text_basics.pdf](../assets/reportlab/text_basics.pdf)
+
+<details>
+<summary>Preview (PDF)</summary>
+
+<object data="../assets/reportlab/text_basics.pdf" type="application/pdf" style="width:100%;height:600px;border:1px solid var(--border);border-radius:10px;background:var(--code-bg)">
+    <p>Your browser can’t preview PDFs here. Download instead: <a href="../assets/reportlab/text_basics.pdf">text_basics.pdf</a></p>
+</object>
+
+</details>
 
 ### Text Alignment
 
@@ -956,6 +1170,17 @@ c.drawRightString(w/2, h - 180, "Right to center →")
 
 c.save()
 ```
+
+- Download: [text_align.pdf](../assets/reportlab/text_align.pdf)
+
+<details>
+<summary>Preview (PDF)</summary>
+
+<object data="../assets/reportlab/text_align.pdf" type="application/pdf" style="width:100%;height:600px;border:1px solid var(--border);border-radius:10px;background:var(--code-bg)">
+    <p>Your browser can’t preview PDFs here. Download instead: <a href="../assets/reportlab/text_align.pdf">text_align.pdf</a></p>
+</object>
+
+</details>
 
 ### Text Wrapping with textobject
 
@@ -1001,6 +1226,17 @@ c.drawText(text)
 c.save()
 ```
 
+- Download: [textobject.pdf](../assets/reportlab/textobject.pdf)
+
+<details>
+<summary>Preview (PDF)</summary>
+
+<object data="../assets/reportlab/textobject.pdf" type="application/pdf" style="width:100%;height:600px;border:1px solid var(--border);border-radius:10px;background:var(--code-bg)">
+    <p>Your browser can’t preview PDFs here. Download instead: <a href="../assets/reportlab/textobject.pdf">textobject.pdf</a></p>
+</object>
+
+</details>
+
 ### Fonts & Font Management
 
 ReportLab includes 14 built-in PDF fonts (the "PDF Base 14"):
@@ -1042,6 +1278,17 @@ for font_name in standard_fonts:
 
 c.save()
 ```
+
+- Download: [font_list.pdf](../assets/reportlab/font_list.pdf)
+
+<details>
+<summary>Preview (PDF)</summary>
+
+<object data="../assets/reportlab/font_list.pdf" type="application/pdf" style="width:100%;height:600px;border:1px solid var(--border);border-radius:10px;background:var(--code-bg)">
+    <p>Your browser can’t preview PDFs here. Download instead: <a href="../assets/reportlab/font_list.pdf">font_list.pdf</a></p>
+</object>
+
+</details>
 
 ### Registering TrueType Fonts
 
@@ -1150,6 +1397,21 @@ story.append(Paragraph(
 doc.build(story)
 print("platypus_intro.pdf created!")
 ```
+
+```output
+platypus_intro.pdf created!
+```
+
+- Download: [platypus_intro.pdf](../assets/reportlab/platypus_intro.pdf)
+
+<details>
+<summary>Preview (PDF)</summary>
+
+<object data="../assets/reportlab/platypus_intro.pdf" type="application/pdf" style="width:100%;height:600px;border:1px solid var(--border);border-radius:10px;background:var(--code-bg)">
+    <p>Your browser can’t preview PDFs here. Download instead: <a href="../assets/reportlab/platypus_intro.pdf">platypus_intro.pdf</a></p>
+</object>
+
+</details>
 
 ### SimpleDocTemplate
 
@@ -1558,6 +1820,26 @@ story.append(table)
 doc.build(story)
 ```
 
+- Download: [basic_table.pdf](../assets/reportlab/basic_table.pdf)
+
+<details>
+<summary>Preview (PDF)</summary>
+
+<object data="../assets/reportlab/basic_table.pdf" type="application/pdf" style="width:100%;height:600px;border:1px solid var(--border);border-radius:10px;background:var(--code-bg)">
+    <p>Your browser can’t preview PDFs here. Download instead: <a href="../assets/reportlab/basic_table.pdf">basic_table.pdf</a></p>
+</object>
+
+</details>
+
+<details>
+<summary>Try it (table exercises)</summary>
+
+- Add a **Total** row at the bottom and style it with bold text.
+- Make the **header row** taller by increasing top/bottom padding.
+- Highlight rows where Department is `Engineering` using conditional styling.
+
+</details>
+
 ### TableStyle Commands
 
 Complete reference for `TableStyle` commands:
@@ -1737,6 +2019,17 @@ story.append(table)
 doc.build(story)
 ```
 
+- Download: [rich_table.pdf](../assets/reportlab/rich_table.pdf)
+
+<details>
+<summary>Preview (PDF)</summary>
+
+<object data="../assets/reportlab/rich_table.pdf" type="application/pdf" style="width:100%;height:600px;border:1px solid var(--border);border-radius:10px;background:var(--code-bg)">
+    <p>Your browser can’t preview PDFs here. Download instead: <a href="../assets/reportlab/rich_table.pdf">rich_table.pdf</a></p>
+</object>
+
+</details>
+
 ### Long Tables Across Pages
 
 For tables that span multiple pages with repeated headers:
@@ -1783,6 +2076,17 @@ table.setStyle(TableStyle([
 story.append(table)
 doc.build(story)
 ```
+
+- Download: [long_table.pdf](../assets/reportlab/long_table.pdf)
+
+<details>
+<summary>Preview (PDF)</summary>
+
+<object data="../assets/reportlab/long_table.pdf" type="application/pdf" style="width:100%;height:600px;border:1px solid var(--border);border-radius:10px;background:var(--code-bg)">
+    <p>Your browser can’t preview PDFs here. Download instead: <a href="../assets/reportlab/long_table.pdf">long_table.pdf</a></p>
+</object>
+
+</details>
 
 ### Dynamic Tables from Data
 
@@ -1939,6 +2243,8 @@ story.append(img3)
 doc.build(story)
 ```
 
+> **Note:** This example requires local image files (`photo.jpg`, `logo.png`). No embedded preview is provided.
+
 ### Images from URLs & Bytes
 
 ```python
@@ -2036,6 +2342,17 @@ for i in range(1, 6):
 doc.build(story, onFirstPage=header_footer, onLaterPages=header_footer)
 ```
 
+- Download: [header_footer.pdf](../assets/reportlab/header_footer.pdf)
+
+<details>
+<summary>Preview (PDF)</summary>
+
+<object data="../assets/reportlab/header_footer.pdf" type="application/pdf" style="width:100%;height:600px;border:1px solid var(--border);border-radius:10px;background:var(--code-bg)">
+    <p>Your browser can’t preview PDFs here. Download instead: <a href="../assets/reportlab/header_footer.pdf">header_footer.pdf</a></p>
+</object>
+
+</details>
+
 ### Page Numbers
 
 Several ways to add page numbers:
@@ -2116,6 +2433,17 @@ for i in range(20):
 doc.build(story)
 ```
 
+- Download: [two_columns.pdf](../assets/reportlab/two_columns.pdf)
+
+<details>
+<summary>Preview (PDF)</summary>
+
+<object data="../assets/reportlab/two_columns.pdf" type="application/pdf" style="width:100%;height:600px;border:1px solid var(--border);border-radius:10px;background:var(--code-bg)">
+    <p>Your browser can’t preview PDFs here. Download instead: <a href="../assets/reportlab/two_columns.pdf">two_columns.pdf</a></p>
+</object>
+
+</details>
+
 ### BaseDocTemplate & PageTemplate
 
 For complex layouts, use `BaseDocTemplate` with custom `PageTemplate`s:
@@ -2185,6 +2513,17 @@ for i in range(1, 4):
 
 doc.build(story)
 ```
+
+- Download: [complex_layout.pdf](../assets/reportlab/complex_layout.pdf)
+
+<details>
+<summary>Preview (PDF)</summary>
+
+<object data="../assets/reportlab/complex_layout.pdf" type="application/pdf" style="width:100%;height:600px;border:1px solid var(--border);border-radius:10px;background:var(--code-bg)">
+    <p>Your browser can’t preview PDFs here. Download instead: <a href="../assets/reportlab/complex_layout.pdf">complex_layout.pdf</a></p>
+</object>
+
+</details>
 
 ### Frame Objects
 
@@ -2257,6 +2596,17 @@ for i in range(5):
 
 doc.build(story, onFirstPage=add_watermark, onLaterPages=add_watermark)
 ```
+
+- Download: [watermark.pdf](../assets/reportlab/watermark.pdf)
+
+<details>
+<summary>Preview (PDF)</summary>
+
+<object data="../assets/reportlab/watermark.pdf" type="application/pdf" style="width:100%;height:600px;border:1px solid var(--border);border-radius:10px;background:var(--code-bg)">
+    <p>Your browser can’t preview PDFs here. Download instead: <a href="../assets/reportlab/watermark.pdf">watermark.pdf</a></p>
+</object>
+
+</details>
 
 ---
 
@@ -2340,6 +2690,17 @@ for color, (x, y) in zip(colors, positions):
 c.save()
 ```
 
+    - Download: [transparency.pdf](../assets/reportlab/transparency.pdf)
+
+    <details>
+    <summary>Preview (PDF)</summary>
+
+    <object data="../assets/reportlab/transparency.pdf" type="application/pdf" style="width:100%;height:600px;border:1px solid var(--border);border-radius:10px;background:var(--code-bg)">
+        <p>Your browser can’t preview PDFs here. Download instead: <a href="../assets/reportlab/transparency.pdf">transparency.pdf</a></p>
+    </object>
+
+    </details>
+
 ### Gradients
 
 ReportLab doesn't have native gradient fills, but you can simulate them:
@@ -2368,6 +2729,17 @@ for i in range(steps):
 
 c.save()
 ```
+
+    - Download: [gradient.pdf](../assets/reportlab/gradient.pdf)
+
+    <details>
+    <summary>Preview (PDF)</summary>
+
+    <object data="../assets/reportlab/gradient.pdf" type="application/pdf" style="width:100%;height:600px;border:1px solid var(--border);border-radius:10px;background:var(--code-bg)">
+        <p>Your browser can’t preview PDFs here. Download instead: <a href="../assets/reportlab/gradient.pdf">gradient.pdf</a></p>
+    </object>
+
+    </details>
 
 ---
 
@@ -2425,6 +2797,26 @@ story.append(drawing)
 
 doc.build(story)
 ```
+
+- Download: [pie_chart.pdf](../assets/reportlab/pie_chart.pdf)
+
+<details>
+<summary>Preview (PDF)</summary>
+
+<object data="../assets/reportlab/pie_chart.pdf" type="application/pdf" style="width:100%;height:600px;border:1px solid var(--border);border-radius:10px;background:var(--code-bg)">
+    <p>Your browser can’t preview PDFs here. Download instead: <a href="../assets/reportlab/pie_chart.pdf">pie_chart.pdf</a></p>
+</object>
+
+</details>
+
+<details>
+<summary>Try it (chart exercises)</summary>
+
+- Change the data so one slice dominates (e.g. `[60, 15, 10, 10, 5]`) and see how label placement changes.
+- Turn off side labels with `pie.sideLabels = False` and compare readability.
+- Experiment with slice colors to match your brand palette.
+
+</details>
 
 ### Bar Charts
 
@@ -2619,6 +3011,17 @@ barcode.drawOn(c, 2*cm, h - 5*cm)
 c.save()
 ```
 
+- Download: [barcode.pdf](../assets/reportlab/barcode.pdf)
+
+<details>
+<summary>Preview (PDF)</summary>
+
+<object data="../assets/reportlab/barcode.pdf" type="application/pdf" style="width:100%;height:600px;border:1px solid var(--border);border-radius:10px;background:var(--code-bg)">
+    <p>Your browser can’t preview PDFs here. Download instead: <a href="../assets/reportlab/barcode.pdf">barcode.pdf</a></p>
+</object>
+
+</details>
+
 ### QR Codes
 
 ```python
@@ -2654,6 +3057,17 @@ d2.drawOn(c, 10*cm, h - 8*cm)
 c.save()
 ```
 
+- Download: [qrcode.pdf](../assets/reportlab/qrcode.pdf)
+
+<details>
+<summary>Preview (PDF)</summary>
+
+<object data="../assets/reportlab/qrcode.pdf" type="application/pdf" style="width:100%;height:600px;border:1px solid var(--border);border-radius:10px;background:var(--code-bg)">
+    <p>Your browser can’t preview PDFs here. Download instead: <a href="../assets/reportlab/qrcode.pdf">qrcode.pdf</a></p>
+</object>
+
+</details>
+
 ### Barcodes in Platypus
 
 ```python
@@ -2680,10 +3094,7 @@ barcode = code128.Code128(
     barHeight=40,
     humanReadable=True,
 )
-
-d1 = Drawing(300, 60)
-d1.add(barcode)
-story.append(d1)
+story.append(barcode)
 story.append(Spacer(1, 20))
 
 # QR code as a flowable
@@ -2698,6 +3109,17 @@ story.append(d2)
 
 doc.build(story)
 ```
+
+- Download: [barcodes_platypus.pdf](../assets/reportlab/barcodes_platypus.pdf)
+
+<details>
+<summary>Preview (PDF)</summary>
+
+<object data="../assets/reportlab/barcodes_platypus.pdf" type="application/pdf" style="width:100%;height:600px;border:1px solid var(--border);border-radius:10px;background:var(--code-bg)">
+    <p>Your browser can’t preview PDFs here. Download instead: <a href="../assets/reportlab/barcodes_platypus.pdf">barcodes_platypus.pdf</a></p>
+</object>
+
+</details>
 
 **Available Barcode Types:**
 
@@ -2732,6 +3154,17 @@ c.setKeywords(["report", "sales", "2026", "pdf"])
 c.drawString(100, 700, "Check File > Properties in your PDF viewer!")
 c.save()
 ```
+
+- Download: [metadata.pdf](../assets/reportlab/metadata.pdf)
+
+<details>
+<summary>Preview (PDF)</summary>
+
+<object data="../assets/reportlab/metadata.pdf" type="application/pdf" style="width:100%;height:600px;border:1px solid var(--border);border-radius:10px;background:var(--code-bg)">
+    <p>Your browser can’t preview PDFs here. Download instead: <a href="../assets/reportlab/metadata.pdf">metadata.pdf</a></p>
+</object>
+
+</details>
 
 With Platypus:
 
@@ -2772,6 +3205,12 @@ c = canvas.Canvas("encrypted.pdf", pagesize=A4, encrypt=enc)
 c.drawString(100, 700, "This PDF is password-protected!")
 c.save()
 ```
+
+```output
+Creates a password-protected PDF.
+```
+
+- Download: [encrypted.pdf](../assets/reportlab/encrypted.pdf) (password: `reader123`)
 
 ### Bookmarks & Outlines
 
@@ -2815,6 +3254,17 @@ c.drawString(72, h - 72, "Chapter 3: Conclusion")
 c.save()
 ```
 
+- Download: [bookmarks.pdf](../assets/reportlab/bookmarks.pdf)
+
+<details>
+<summary>Preview (PDF)</summary>
+
+<object data="../assets/reportlab/bookmarks.pdf" type="application/pdf" style="width:100%;height:600px;border:1px solid var(--border);border-radius:10px;background:var(--code-bg)">
+    <p>Your browser can’t preview PDFs here. Download instead: <a href="../assets/reportlab/bookmarks.pdf">bookmarks.pdf</a></p>
+</object>
+
+</details>
+
 ### Hyperlinks
 
 ```python
@@ -2856,6 +3306,17 @@ c.drawString(72, h - 72, "Chapter 2")
 
 c.save()
 ```
+
+- Download: [hyperlinks.pdf](../assets/reportlab/hyperlinks.pdf)
+
+<details>
+<summary>Preview (PDF)</summary>
+
+<object data="../assets/reportlab/hyperlinks.pdf" type="application/pdf" style="width:100%;height:600px;border:1px solid var(--border);border-radius:10px;background:var(--code-bg)">
+    <p>Your browser can’t preview PDFs here. Download instead: <a href="../assets/reportlab/hyperlinks.pdf">hyperlinks.pdf</a></p>
+</object>
+
+</details>
 
 ---
 
@@ -2999,10 +3460,22 @@ invoice = {
 generate_invoice("invoice.pdf", invoice)
 ```
 
+- Download: [invoice.pdf](../assets/reportlab/invoice.pdf)
+
+<details>
+<summary>Preview (PDF)</summary>
+
+<object data="../assets/reportlab/invoice.pdf" type="application/pdf" style="width:100%;height:600px;border:1px solid var(--border);border-radius:10px;background:var(--code-bg)">
+    <p>Your browser can’t preview PDFs here. Download instead: <a href="../assets/reportlab/invoice.pdf">invoice.pdf</a></p>
+</object>
+
+</details>
+
 ### Multi-Page Report from CSV
 
 ```python
 import csv
+from datetime import date
 from reportlab.platypus import (
     SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak
 )
@@ -3028,7 +3501,7 @@ def generate_csv_report(csv_path, output_path, title="Data Report"):
     story.append(PageBreak())
 
     # Read CSV
-    with open(csv_path, "r") as f:
+    with open(csv_path, "r", newline="", encoding="utf-8") as f:
         reader = csv.reader(f)
         headers = next(reader)
         rows = list(reader)
@@ -3064,8 +3537,28 @@ def generate_csv_report(csv_path, output_path, title="Data Report"):
     doc.build(story)
 
 # Usage:
-# generate_csv_report("sales_data.csv", "sales_report.pdf", "Q1 Sales Report")
+sample_csv = "sales_data.csv"
+with open(sample_csv, "w", newline="", encoding="utf-8") as f:
+    writer = csv.writer(f)
+    writer.writerow(["Date", "Region", "Product", "Units", "Revenue"])
+    writer.writerow(["2026-01-05", "North", "Widget", "12", "£599.88"])
+    writer.writerow(["2026-01-08", "South", "Gadget", "7", "£419.93"])
+    writer.writerow(["2026-01-14", "East", "Service", "1", "£1200.00"])
+    writer.writerow(["2026-01-22", "West", "Widget", "4", "£199.96"])
+
+generate_csv_report(sample_csv, "sales_report.pdf", "Q1 Sales Report")
 ```
+
+- Download: [sales_report.pdf](../assets/reportlab/sales_report.pdf)
+
+<details>
+<summary>Preview (PDF)</summary>
+
+<object data="../assets/reportlab/sales_report.pdf" type="application/pdf" style="width:100%;height:600px;border:1px solid var(--border);border-radius:10px;background:var(--code-bg)">
+    <p>Your browser can’t preview PDFs here. Download instead: <a href="../assets/reportlab/sales_report.pdf">sales_report.pdf</a></p>
+</object>
+
+</details>
 
 ### Certificate Generator
 
@@ -3149,6 +3642,17 @@ generate_certificate(
     "CERT-2026-00142"
 )
 ```
+
+- Download: [certificate.pdf](../assets/reportlab/certificate.pdf)
+
+<details>
+<summary>Preview (PDF)</summary>
+
+<object data="../assets/reportlab/certificate.pdf" type="application/pdf" style="width:100%;height:600px;border:1px solid var(--border);border-radius:10px;background:var(--code-bg)">
+    <p>Your browser can’t preview PDFs here. Download instead: <a href="../assets/reportlab/certificate.pdf">certificate.pdf</a></p>
+</object>
+
+</details>
 
 ### Letter & Letterhead
 
@@ -3261,6 +3765,17 @@ generate_letter(
     date_str="16 February 2026",
 )
 ```
+
+- Download: [letter.pdf](../assets/reportlab/letter.pdf)
+
+<details>
+<summary>Preview (PDF)</summary>
+
+<object data="../assets/reportlab/letter.pdf" type="application/pdf" style="width:100%;height:600px;border:1px solid var(--border);border-radius:10px;background:var(--code-bg)">
+    <p>Your browser can’t preview PDFs here. Download instead: <a href="../assets/reportlab/letter.pdf">letter.pdf</a></p>
+</object>
+
+</details>
 
 ---
 

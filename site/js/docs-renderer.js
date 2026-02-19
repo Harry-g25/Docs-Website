@@ -120,6 +120,33 @@
     hljs.highlightElement(block);
   });
 
+  // ===== 3b. PDF embeds: bigger preview + full-page link =====
+  // Many guides embed PDFs via <object type="application/pdf">.
+  // QtWebEngine and some browsers can preview them inline, but users may want a
+  // full-page PDF view (like a normal PDF viewer). We provide both.
+  $$('object[type="application/pdf"]', content).forEach(obj => {
+    const src = (obj.getAttribute('data') || '').trim();
+    if (!src) return;
+    if (obj.dataset.pdfEnhanced === '1') return;
+    obj.dataset.pdfEnhanced = '1';
+
+    // Make the inline preview feel like a full-page viewer.
+    // Keep border styling from the HTML, but increase height.
+    obj.style.height = '85vh';
+
+    // Add an "Open PDF (full page)" link above the object.
+    const row = document.createElement('p');
+    row.style.margin = '0 0 10px 0';
+
+    const a = document.createElement('a');
+    a.href = withVersion(src);
+    a.textContent = 'Open PDF (full page)';
+    a.title = 'Open the PDF without the doc page UI';
+
+    row.appendChild(a);
+    obj.parentNode.insertBefore(row, obj);
+  });
+
   // ===== 4. Estimated reading time =====
   const wordCount = content.innerText.split(/\s+/).length;
   const readMin = Math.max(1, Math.ceil(wordCount / 220));

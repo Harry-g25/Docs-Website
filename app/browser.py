@@ -6,16 +6,22 @@ optional ContentManager side panel via QSplitter.
 """
 
 import sys
+from pathlib import Path
 
-from PyQt6.QtCore import Qt, QSize, QUrl, QSettings
+from PyQt6.QtCore import Qt, QSize, QUrl, QSettings, QStandardPaths
 from PyQt6.QtGui import QKeySequence, QShortcut
+from PyQt6.QtGui import QDesktopServices
 from PyQt6.QtWidgets import (
     QApplication, QHBoxLayout, QLabel, QLineEdit, QMainWindow, QMenu,
     QPushButton, QSizePolicy, QSplitter, QStyle, QSystemTrayIcon,
     QToolBar, QVBoxLayout, QWidget,
 )
 from PyQt6.QtWebEngineWidgets import QWebEngineView
-from PyQt6.QtWebEngineCore import QWebEnginePage
+from PyQt6.QtWebEngineCore import (
+    QWebEnginePage,
+    QWebEngineSettings,
+    QWebEngineDownloadRequest,
+)
 
 from app.config import SETTINGS_ORG, SETTINGS_APP
 from app.icons import (
@@ -133,9 +139,46 @@ class DocsBrowser(QMainWindow):
     # ── WebView ─────────────────────────────────────────
     def _init_web(self):
         self.web = QWebEngineView()
+
+        settings = self.web.settings()
+        settings.setAttribute(QWebEngineSettings.WebAttribute.PdfViewerEnabled, True)
+        settings.setAttribute(QWebEngineSettings.WebAttribute.PluginsEnabled, True)
+
+        profile = self.web.page().profile()
+        profile.downloadRequested.connect(self._on_download_requested)
+
         self.web.setUrl(self.home_url)
         self.web.urlChanged.connect(self._on_url_changed)
         self.web.titleChanged.connect(self._on_title_changed)
+
+    def _on_download_requested(self, download: QWebEngineDownloadRequest):
+        download_dir = QStandardPaths.writableLocation(
+            QStandardPaths.StandardLocation.DownloadLocation
+        )
+        if not download_dir:
+            download_dir = str(Path.home() / "Downloads")
+
+        try:
+            Path(download_dir).mkdir(parents=True, exist_ok=True)
+        except Exception:
+            download_dir = str(Path.home())
+
+        download.setDownloadDirectory(download_dir)
+
+        def _maybe_open_when_done():
+            try:
+                if download.state() != QWebEngineDownloadRequest.DownloadState.DownloadCompleted:
+                    return
+                name = (download.downloadFileName() or "").lower()
+                if not name.endswith(".pdf"):
+                    return
+                local_path = str(Path(download.downloadDirectory()) / download.downloadFileName())
+                QDesktopServices.openUrl(QUrl.fromLocalFile(local_path))
+            except Exception:
+                return
+
+        download.stateChanged.connect(lambda _state: _maybe_open_when_done())
+        download.accept()
 
     # ── Central layout (splitter) ───────────────────────
     def _init_layout(self):
