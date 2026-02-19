@@ -750,6 +750,209 @@ class AddDocWizard(QDialog):
             f"background: {bg}; border: 2px solid {border}; color: #e2e8f0;"
         )
 
+    @staticmethod
+    def _suggest_metadata_from_markdown(md_path: str) -> dict:
+        """Best-effort extraction of metadata from a markdown file.
+
+        Supported sources:
+        - YAML frontmatter at the top (--- ... ---): title/version/description/tags
+        - First H1 (# ...)
+        - "Version:" or "**Version:**" lines
+        - First intro paragraph or blockquote after H1 (for description)
+        """
+        meta = {
+            "title": "",
+            "version": "",
+            "description": "",
+            "tags": [],
+        }
+
+        def _clean(s: str) -> str:
+            return " ".join(s.strip().split())
+
+        def _parse_frontmatter(front_lines: list[str]) -> dict:
+            fm = {"title": "", "version": "", "description": "", "tags": []}
+            i = 0
+            while i < len(front_lines):
+                raw = front_lines[i].rstrip("\n")
+                if not raw.strip() or raw.lstrip().startswith("#"):
+                    i += 1
+                    continue
+
+                m = re.match(r"^([A-Za-z0-9_-]+)\s*:\s*(.*)$", raw)
+                if not m:
+                    i += 1
+                    continue
+
+                key = m.group(1).strip().lower()
+                val = m.group(2).strip()
+
+                if key in {"title", "version", "description"}:
+                    if val and ((val[0] == val[-1] == '"') or (val[0] == val[-1] == "'")):
+                        val = val[1:-1]
+                    fm[key] = _clean(val)
+                    i += 1
+                    continue
+
+                if key == "tags":
+                    tags: list[str] = []
+                    # tags: [a, b]
+                    if val.startswith("[") and val.endswith("]"):
+                        inner = val[1:-1]
+                        for part in inner.split(","):
+                            t = _clean(part.strip(" ' \""))
+                            if t:
+                                tags.append(t)
+                        fm["tags"] = tags
+                        i += 1
+                        continue
+
+                    # tags:
+                    #  - a
+                    #  - b
+                    if not val:
+                        j = i + 1
+                        while j < len(front_lines):
+                            nxt = front_lines[j].rstrip("\n")
+                            m2 = re.match(r"^\s*-\s*(.+)$", nxt)
+                            if not m2:
+                                break
+                            t = _clean(m2.group(1).strip(" ' \""))
+                            if t:
+                                tags.append(t)
+                            j += 1
+                        fm["tags"] = tags
+                        i = j
+                        continue
+
+                    # tags: a, b
+                    for part in val.split(","):
+                        t = _clean(part.strip(" ' \""))
+                        if t:
+                            tags.append(t)
+                    fm["tags"] = tags
+                    i += 1
+                    continue
+
+                i += 1
+            return fm
+
+        try:
+            with open(md_path, "r", encoding="utf-8") as f:
+                lines = f.readlines()
+
+            # Scan the top of the file first (fast for very large docs)
+            head = lines[:400]
+
+            # 0) Optional YAML frontmatter
+            if head and head[0].strip() == "---":
+                fm_lines: list[str] = []
+                for raw in head[1:]:
+                    if raw.strip() == "---":
+                        break
+                    fm_lines.append(raw)
+                fm = _parse_frontmatter(fm_lines)
+                for k in ("title", "version", "description"):
+                    if fm.get(k):
+                        meta[k] = fm[k]
+                if fm.get("tags"):
+                    meta["tags"] = fm["tags"]
+
+            # 1) Title: first H1
+            if not meta["title"]:
+                for raw in head:
+                    m = re.match(r"^#\s+(.+)", raw.strip())
+                    if m:
+                        meta["title"] = _clean(m.group(1))
+                        break
+
+            # 2) Version: common metadata line
+            if not meta["version"]:
+                for raw in head:
+                    s = raw.strip()
+                    m = re.match(r"^\*\*Version:\*\*\s*(.+)$", s, flags=re.IGNORECASE)
+                    if not m:
+                        m = re.match(r"^Version:\s*(.+)$", s, flags=re.IGNORECASE)
+                    if m:
+                        token = m.group(1)
+                        m2 = re.search(
+                            r"\b(v?\d+(?:\.\d+){1,3})\b",
+                            token,
+                            flags=re.IGNORECASE,
+                        )
+                        if m2:
+                            meta["version"] = m2.group(1)
+                        break
+
+            # 3) Fallback: infer version from title (e.g. "Python 3.14" -> v3.14)
+            if not meta["version"] and meta["title"]:
+                m = re.search(
+                    r"\b(v?\d+(?:\.\d+){1,3})\b",
+                    meta["title"],
+                    flags=re.IGNORECASE,
+                )
+                if m:
+                    meta["version"] = m.group(1)
+
+            # 4) Description: first intro paragraph or blockquote after H1
+            if not meta["description"]:
+                h1_idx = -1
+                for i, raw in enumerate(head):
+                    if re.match(r"^#\s+", raw.strip()):
+                        h1_idx = i
+                        break
+
+                if h1_idx != -1:
+                    buf: list[str] = []
+                    started = False
+                    for raw in head[h1_idx + 1 :]:
+                        s = raw.rstrip("\n")
+                        st = s.strip()
+
+                        if st.startswith("##"):
+                            break
+                        if st == "---":
+                            if started:
+                                break
+                            continue
+                        if not st:
+                            if started:
+                                break
+                            continue
+
+                        # Ignore obvious metadata rows like **Version:** (colon inside bold)
+                        if re.match(
+                            r"^\*\*(Version|Last Updated|Official Website|PyPI)\s*:\*\*\s*",
+                            st,
+                            flags=re.IGNORECASE,
+                        ):
+                            continue
+                        # Ignore metadata rows like **Version**: (colon outside bold)
+                        if re.match(
+                            r"^\*\*(Version|Last Updated|Official Website|PyPI)\*\*\s*:\s*",
+                            st,
+                            flags=re.IGNORECASE,
+                        ):
+                            continue
+                        if re.match(r"^(Version|Last Updated|Official Website|PyPI)\s*:\s*", st, flags=re.IGNORECASE):
+                            continue
+
+                        started = True
+                        if st.startswith(">"):
+                            st = st.lstrip(">").strip()
+                        buf.append(st)
+                        if len(" ".join(buf)) >= 220:
+                            break
+
+                    meta["description"] = _clean(" ".join(buf))
+
+        except Exception:
+            return meta
+
+        if meta["version"] and not meta["version"].lower().startswith("v"):
+            meta["version"] = "v" + meta["version"]
+        return meta
+
     def _browse_file(self):
         path, _ = QFileDialog.getOpenFileName(
             self, "Select Markdown File", "",
@@ -758,15 +961,15 @@ class AddDocWizard(QDialog):
         if path:
             self._md_path = path
             self.file_input.setText(path)
-            try:
-                with open(path, "r", encoding="utf-8") as f:
-                    for line in f.readlines()[:20]:
-                        m = re.match(r"^#\s+(.+)", line.strip())
-                        if m:
-                            self.title_input.setText(m.group(1).strip())
-                            break
-            except Exception:
-                pass
+            meta = self._suggest_metadata_from_markdown(path)
+            if meta.get("title"):
+                self.title_input.setText(meta["title"])
+            if meta.get("version") and not self.version_input.text().strip():
+                self.version_input.setText(meta["version"])
+            if meta.get("description") and not self.desc_input.toPlainText().strip():
+                self.desc_input.setPlainText(meta["description"])
+            if meta.get("tags") and not self.tags_input.text().strip():
+                self.tags_input.setText(", ".join(meta["tags"]))
 
     def _update_slug_hint(self, text: str):
         s = slugify(text) if text.strip() else "…"

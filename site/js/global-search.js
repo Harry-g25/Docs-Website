@@ -151,7 +151,7 @@
     loadingPromise = Promise.all(
       DOCS.map(async (doc) => {
         try {
-          const res = await fetch(withVersion(doc.mdPath), { cache: 'no-store' });
+          const res = await fetch(withVersion(doc.mdPath), { cache: assetVersion ? 'force-cache' : 'no-store' });
           if (!res.ok) return [];
           const md = await res.text();
           return parseMarkdown(md, doc);

@@ -101,6 +101,36 @@ python tools/add_doc.py path/to/your-guide.md
 
 The wizard prompts for title, category, version, description, tags, and colours, then wires everything up automatically.
 
+## Asset Versioning (cache-busting)
+
+This repo uses a single version string (`window.__ASSET_VERSION`) to keep the site fast and consistent across:
+
+- Hub links (`pages/*.html?v=...`)
+- Static assets (`css/*.css?v=...`, `js/*.js?v=...`)
+- Markdown fetches (via JS appending `?v=` when a version exists)
+
+Version format: `YYYYMMDD-N` (example: `20260219-1`).
+
+### Bump the version
+
+Run this before publishing to GitHub Pages (or whenever you want browsers to refresh cached assets):
+
+```bash
+python tools/bump_asset_version.py
+```
+
+Preview changes without writing files:
+
+```bash
+python tools/bump_asset_version.py --dry-run
+```
+
+Set an explicit version:
+
+```bash
+python tools/bump_asset_version.py --set 20260219-3
+```
+
 ## Tools
 
 | Tool | Purpose |
@@ -108,6 +138,7 @@ The wizard prompts for title, category, version, description, tags, and colours,
 | `add_doc.py` | Interactive CLI wizard to add a new doc to the hub |
 | `check_fences.py` | Validate Markdown code-fence balance |
 | `generate_icon.py` | Generate app icon (SVG + ICO) |
+| `bump_asset_version.py` | Bump `window.__ASSET_VERSION` and rewrite `?v=` cache-busters |
 
 ## Requirements
 

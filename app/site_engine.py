@@ -18,6 +18,33 @@ from app.config import INDEX_HTML, SEARCH_JS, CONTENT_DIR, PAGES_DIR
 from app.icons import CARD_ICONS, SECTION_ICONS
 
 
+def _read_asset_version_from_index() -> str:
+    """Read window.__ASSET_VERSION from site/index.html.
+
+    Returns empty string if not found.
+    """
+    try:
+        with open(INDEX_HTML, "r", encoding="utf-8") as f:
+            html = f.read()
+    except OSError:
+        return ""
+    m = re.search(
+        r"window\.__ASSET_VERSION\s*=\s*['\"]([^'\"]+)['\"]\s*;",
+        html,
+    )
+    return m.group(1).strip() if m else ""
+
+
+def _with_version(url: str, asset_version: str) -> str:
+    if not asset_version:
+        return url
+    if not url:
+        return url
+    if "?" in url:
+        return url
+    return f"{url}?v={asset_version}"
+
+
 # ── Utilities ────────────────────────────────────────────────
 
 def slugify(text: str) -> str:
@@ -76,12 +103,14 @@ def generate_card_html(
     icon_svg: str,
 ) -> str:
     """Generate a hub-card <a> block."""
+    asset_v = _read_asset_version_from_index()
+    href = _with_version(f"pages/{slug}.html", asset_v)
     tags_html = "\n".join(
         f'            <span class="hub-tag">{t}</span>' for t in tags
     )
     return textwrap.dedent(f"""\
           <!-- {title} Card -->
-          <a href="pages/{slug}.html" class="hub-card">
+          <a href="{href}" class="hub-card">
             <div class="hub-card-icon" style="background: linear-gradient(135deg, {color1}, {color2});">
               {icon_svg}
             </div>
@@ -136,8 +165,16 @@ def generate_new_section_html(
 def generate_doc_page(
     slug: str, title: str, version: str, doc_id: str, color1: str
 ) -> str:
-    """Generate a full doc HTML page from template."""
-    return textwrap.dedent(f"""\
+  asset_v = _read_asset_version_from_index()
+  hl_dark = _with_version("../css/highlight-github-dark.min.css", asset_v)
+  js_hl = _with_version("../js/highlight.min.js", asset_v)
+  js_py = _with_version("../js/highlight-python.min.js", asset_v)
+  js_bash = _with_version("../js/highlight-bash.min.js", asset_v)
+  js_json = _with_version("../js/highlight-json.min.js", asset_v)
+  js_marked = _with_version("../js/marked.min.js", asset_v)
+  css_style = _with_version("../css/style.css", asset_v)
+  js_renderer = _with_version("../js/docs-renderer.js", asset_v)
+  return textwrap.dedent(f"""\
 <!doctype html>
 <html lang="en" data-theme="dark" data-doc="{doc_id}">
 <head>
@@ -146,16 +183,16 @@ def generate_doc_page(
   <title>{title} — Documentation</title>
 
   <!-- Highlight.js for code blocks (local) -->
-  <link id="hljs-theme" rel="stylesheet" href="../css/highlight-github-dark.min.css">
-  <script src="../js/highlight.min.js"></script>
-  <script src="../js/highlight-python.min.js"></script>
-  <script src="../js/highlight-bash.min.js"></script>
-  <script src="../js/highlight-json.min.js"></script>
+  <link id="hljs-theme" rel="stylesheet" href="{hl_dark}">
+  <script src="{js_hl}"></script>
+  <script src="{js_py}"></script>
+  <script src="{js_bash}"></script>
+  <script src="{js_json}"></script>
 
   <!-- Marked (local) -->
-  <script src="../js/marked.min.js"></script>
+  <script src="{js_marked}"></script>
 
-  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="{css_style}">
 
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="../icon.svg">
@@ -167,6 +204,10 @@ def generate_doc_page(
       var t = localStorage.getItem('ctk-theme') || 'dark';
       document.documentElement.setAttribute('data-theme', t);
     }})();
+  </script>
+
+  <script>
+    window.__ASSET_VERSION = '{asset_v}';
   </script>
 </head>
 <body>
@@ -247,7 +288,7 @@ def generate_doc_page(
       title: '{title} Docs'
     }};
   </script>
-  <script src="../js/docs-renderer.js"></script>
+  <script src="{js_renderer}"></script>
 </body>
 </html>
 """)

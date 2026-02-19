@@ -82,7 +82,7 @@
   // ===== 3. Fetch & render Markdown =====
   let md = '';
   try {
-    const res = await fetch(withVersion(mdPath), { cache: 'no-store' });
+    const res = await fetch(withVersion(mdPath), { cache: assetVersion ? 'force-cache' : 'no-store' });
     if (!res.ok) throw new Error(res.statusText);
     md = await res.text();
   } catch (err) {

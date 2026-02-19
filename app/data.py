@@ -211,7 +211,7 @@ def parse_docs(html: str | None = None) -> list[dict]:
         sec_end = html.find("</section>", sec_start)
         sec = html[sec_start:sec_end] if sec_end != -1 else html[sec_start:]
         card_pat = re.compile(
-            r'<a\s+href="pages/([^"]+)\.html"\s+class="hub-card"[^>]*>'
+            r'<a\s+href="pages/([^"?]+)\.html(?:\?[^\"]*)?"\s+class="hub-card"[^>]*>'
             r".*?"
             r'style="background:\s*linear-gradient\(135deg,\s*([^,]+),\s*([^)]+)\)'
             r".*?"
@@ -332,7 +332,7 @@ def delete_doc(slug: str) -> None:
     card_pat = re.compile(
         r"[ \t]*(?:<!-- [^>]+ -->\n)?[ \t]*<a\s+href=\"pages/"
         + re.escape(slug)
-        + r'\.html"\s+class="hub-card"[^>]*>.*?</a>\s*',
+        + r'\.html(?:\?[^\"]*)?\"\s+class="hub-card"[^>]*>.*?</a>\s*',
         re.DOTALL,
     )
     html, n = card_pat.subn("", html, count=1)
@@ -380,7 +380,7 @@ def update_doc_metadata(
     card_pat = re.compile(
         r'([ \t]*(?:<!-- [^>]+ -->\n)?[ \t]*<a\s+href="pages/'
         + re.escape(slug)
-        + r'\.html"\s+class="hub-card"[^>]*>.*?</a>)',
+        + r'\.html(?:\?[^\"]*)?"\s+class="hub-card"[^>]*>.*?</a>)',
         re.DOTALL,
     )
     m = card_pat.search(html)
@@ -487,7 +487,7 @@ def move_doc_to_category(slug: str, new_cat_id: str) -> bool:
     card_pat = re.compile(
         r'([ \t]*(?:<!-- [^>]+ -->\n)?[ \t]*<a\s+href="pages/'
         + re.escape(slug)
-        + r'\.html"\s+class="hub-card"[^>]*>.*?</a>)',
+        + r'\.html(?:\?[^\"]*)?"\s+class="hub-card"[^>]*>.*?</a>)',
         re.DOTALL,
     )
     m = card_pat.search(html)
