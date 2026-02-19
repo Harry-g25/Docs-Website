@@ -152,24 +152,46 @@
 
 CustomTkinter is a modern, fully customizable Python desktop UI library built on top of Tkinter. It provides modern-looking widgets with support for light/dark modes and consistent styling across Windows, macOS, and Linux.
 
+**How to use this guide (recommended order):**
+
+1. Read **Installation & Setup** and run the verification snippet.
+2. Read **Core Concepts** so you understand `CTk`, widget parents, and dynamic updates.
+3. Copy the **Main Window** examples into a file (e.g. `app.py`) and run it.
+4. Pick an **Appearance Mode/Theme** early, then build your layout.
+5. Use the **Widget Reference** to add one widget at a time, testing as you go.
+
+**Prerequisites (so the examples run as-is):**
+
+- Python installed (and `pip` available).
+- A virtual environment is strongly recommended (keeps packages per-project).
+- Basic Tkinter knowledge helps, but is not required.
+
 **Key Features:**
 
 | Name | Description |
 | --- | --- |
-| Modern, customizable widgets |  |
-| Light and dark mode support (system or manual) |  |
-| HighDPI scaling on Windows and macOS |  |
-| Consistent appearance across all platforms |  |
-| Full backward compatibility with Tkinter |  |
-| Lightweight with minimal dependencies |  |
+| Modern, customizable widgets | Buttons, inputs, frames, tabs, etc. with a consistent modern look you can style. |
+| Light and dark mode support (system or manual) | Automatically adapts to OS theme, or you can force Light/Dark. |
+| HighDPI scaling on Windows and macOS | Built-in scaling helpers so your UI remains crisp and readable. |
+| Consistent appearance across all platforms | Same theme + styling concepts across Windows/macOS/Linux. |
+| Full backward compatibility with Tkinter | You can still use Tkinter concepts like `.bind()`, variables, and layout managers. |
+| Lightweight with minimal dependencies | Installs quickly and doesn’t require a heavy GUI stack. |
 
 ---
 
 ## Installation & Setup
 
+This section gets you from **zero → running window**. If something fails, it’s almost always one of: wrong Python environment, `pip` installing into a different interpreter, or missing dependencies.
+
 ### Installation
 
 Install CustomTkinter via pip:
+
+**Step-by-step:**
+
+1. (Recommended) Create and activate a virtual environment for your project.
+2. Run the install command.
+3. If you use an IDE, ensure it’s pointing at the same environment you installed into.
 
 ```bash
 pip install customtkinter
@@ -177,11 +199,27 @@ pip install customtkinter
 
 ### Upgrade to Latest Version
 
+Use this when you want bug fixes or new widgets/parameters.
+
+**Step-by-step:**
+
+1. Activate the environment where CustomTkinter is installed.
+2. Run the upgrade command.
+3. Re-run the version check in the next section.
+
 ```bash
 pip install customtkinter --upgrade
 ```
 
 ### Verify Installation
+
+This confirms you can import the package and shows the version you’re actually running.
+
+**Step-by-step:**
+
+1. Create a file (e.g. `check_ctk.py`).
+2. Paste the snippet.
+3. Run `python check_ctk.py`.
 
 ```python
 import customtkinter
@@ -189,6 +227,14 @@ print(customtkinter.__version__)
 ```
 
 ### Basic Import
+
+Most examples in this guide start with this import.
+
+**Step-by-step:**
+
+1. Import `customtkinter`.
+2. Create a `customtkinter.CTk()` window.
+3. Call `.mainloop()` to start the UI event loop.
 
 ```python
 import customtkinter
@@ -198,9 +244,21 @@ import customtkinter
 
 ## Core Concepts
 
+Before building a UI, it helps to understand three ideas:
+
+- **Your app is a tree**: everything has a parent (the “master”).
+- **Layout is explicit**: you must place widgets using `grid()`, `pack()`, or `place()`.
+- **UI updates are event-driven**: you change widget properties in callbacks.
+
 ### CTk vs Tk
 
 CustomTkinter's `CTk` class replaces standard Tkinter's `Tk` class. It's a drop-in replacement:
+
+**What this means in practice:**
+
+1. Use `customtkinter.CTk()` as your main window.
+2. Use CustomTkinter widgets (`CTkButton`, `CTkFrame`, …) for consistent styling.
+3. You can still use Tkinter APIs like `.bind()` and variables when needed.
 
 ```python
 import customtkinter
@@ -213,6 +271,12 @@ app.mainloop()
 ### String Variables for Dynamic Updates
 
 Like Tkinter, CustomTkinter supports StringVar for keeping text widgets in sync:
+
+**Step-by-step:**
+
+1. Create a `StringVar` with an initial value.
+2. Pass it into a widget via `textvariable=` (e.g. `CTkLabel`).
+3. Call `.set()` on the variable inside callbacks to update the UI.
 
 ```python
 import customtkinter
@@ -241,6 +305,13 @@ app.mainloop()
 
 All CustomTkinter widgets inherit from tkinter.Widget and follow standard widget hierarchy:
 
+**How to think about it:**
+
+1. The top is your `CTk` window.
+2. Use `CTkFrame`/`CTkScrollableFrame` as “containers”.
+3. Put interactive widgets (buttons, entries, sliders) inside containers.
+4. When something looks misplaced, confirm you used the correct `master` parent.
+
 ```
 CTk (Main Window)
 ├── CTkFrame
@@ -256,7 +327,23 @@ CTk (Main Window)
 
 ## Main Window & Application Setup
 
+This section shows the most common “app skeleton”. The general flow is:
+
+1. Create the `CTk` window.
+2. Configure title/size/resizing.
+3. Set global appearance/theme (recommended before creating many widgets).
+4. Create widgets and place them.
+5. Call `.mainloop()`.
+
 ### Basic Window Setup
+
+**Step-by-step:**
+
+1. Create the main window with `customtkinter.CTk()`.
+2. Set title and geometry (width x height).
+3. Set a minimum size to avoid layout issues on resize.
+4. Create and place widgets.
+5. Start the event loop with `.mainloop()`.
 
 ```python
 import customtkinter
@@ -278,12 +365,21 @@ app.mainloop()
 
 ### CTk Arguments
 
+These are the most relevant “window-level” settings. Use them when you want to set a background color or control how appearance mode is chosen.
+
 | Argument | Type | Default | Description |
 |----------|------|---------|-------------|
 | `fg_color` | str/tuple | "white"/"gray20" | Window background color (light, dark) |
 | `appearance_mode` | str | "System" | "System", "Light", or "Dark" |
 
 ### Complete Initialization Example
+
+**Walkthrough (what each block is doing):**
+
+1. Subclassing `CTk` lets you structure your app like a normal class.
+2. `set_appearance_mode()` and `set_default_color_theme()` are **global** settings.
+3. `grid_rowconfigure/grid_columnconfigure` set up responsiveness (widgets can expand).
+4. Put widget creation into methods (e.g. `setup_ui()`) once your UI grows.
 
 ```python
 import customtkinter
@@ -320,6 +416,15 @@ if __name__ == "__main__":
 
 ### CTkToplevel - Secondary Windows
 
+`CTkToplevel` creates a second window owned by your main app (settings, about box, dialogs).
+
+**Step-by-step:**
+
+1. Create a `CTkToplevel(app)` so it belongs to the main window.
+2. Configure title/size.
+3. Create widgets with `top` as their parent.
+4. (Optional) Make it modal using `.transient()` + `.grab_set()` (see patterns section).
+
 ```python
 import customtkinter
 
@@ -351,9 +456,21 @@ app.mainloop()
 
 ## Appearance & Theming
 
+Theming is easiest when you decide it early:
+
+1. Pick an appearance mode: `System`, `Light`, or `Dark`.
+2. Pick a base theme: `blue`, `dark-blue`, or `green`.
+3. Only then fine-tune per-widget colors if you need to.
+
 ### Appearance Modes
 
 CustomTkinter supports three appearance modes:
+
+**Step-by-step:**
+
+1. Call `customtkinter.set_appearance_mode(...)` once, near startup.
+2. Create your window and widgets.
+3. If you add a “toggle”, call `set_appearance_mode()` again in a button callback.
 
 ```python
 import customtkinter
@@ -384,6 +501,14 @@ app.mainloop()
 
 CustomTkinter comes with built-in themes:
 
+**How to choose:**
+
+- Use `blue` for most apps.
+- Use `dark-blue` if you want a slightly more muted look.
+- Use `green` for dashboards or status-heavy UIs.
+
+Themes set default colors for many widgets, so you often don’t need to set `fg_color` manually.
+
 - `"blue"` (default)
 - `"dark-blue"`
 - `"green"`
@@ -401,6 +526,12 @@ app.mainloop()
 ### Color System
 
 Colors in CustomTkinter support multiple formats:
+
+**Step-by-step (theme-aware colors):**
+
+1. Use a single color string for “always the same”.
+2. Use a tuple `(light_color, dark_color)` for theme-aware styling.
+3. Prefer `transparent` when you want the widget to inherit its parent background.
 
 ```python
 import customtkinter
@@ -439,6 +570,15 @@ app.mainloop()
 
 ### Custom Theme File (JSON)
 
+Use a custom theme file when you want a consistent “brand look” across the whole app.
+
+**Step-by-step:**
+
+1. Create a JSON file (e.g. `custom_theme.json`).
+2. Add top-level keys matching widget class names (`CTk`, `CTkButton`, `CTkEntry`, ...).
+3. For each property, provide `[light, dark]` values.
+4. Load it with `set_default_color_theme()` **before** creating most widgets.
+
 Create a `custom_theme.json`:
 
 ```json
@@ -476,6 +616,14 @@ app.mainloop()
 ```
 
 ### CTkFont - Custom Fonts
+
+Fonts can be passed as tuples (Tk style) or as `CTkFont` objects. `CTkFont` is helpful when you want to reuse the same font across many widgets.
+
+**Step-by-step:**
+
+1. Create one or more `CTkFont` objects.
+2. Pass them into widgets via `font=`.
+3. Keep the font objects referenced (e.g. module-level or instance variables) so you can reuse them.
 
 ```python
 import customtkinter
@@ -525,6 +673,12 @@ app.mainloop()
 
 CustomTkinter supports window and widget scaling:
 
+**Step-by-step:**
+
+1. Start with default scaling.
+2. If your UI looks too small/large on high-DPI displays, adjust widget scaling first.
+3. Test on the target machine(s) — scaling depends on OS display settings.
+
 ```python
 import customtkinter
 
@@ -547,7 +701,20 @@ app.mainloop()
 
 CustomTkinter supports three layout managers: `grid()`, `pack()`, and `place()`.
 
+**How to pick:**
+
+- Use `grid()` for almost all “app layouts” (rows/columns, resizable panels).
+- Use `pack()` for quick vertical/horizontal stacking.
+- Use `place()` only for special cases (overlays, pixel-perfect positioning).
+
 ### Grid Layout (Recommended)
+
+**Step-by-step (reliable, resizable UI):**
+
+1. Decide your rows/columns.
+2. Call `grid_rowconfigure` / `grid_columnconfigure` with `weight=1` for areas that should expand.
+3. Place widgets with `sticky="nsew"` if they should stretch.
+4. Use `padx/pady` for consistent spacing.
 
 ```python
 import customtkinter
@@ -583,6 +750,12 @@ app.mainloop()
 
 ### Pack Layout
 
+**Step-by-step (stacking):**
+
+1. Decide the stacking direction (top-to-bottom or left-to-right).
+2. Use `fill="x"` or `fill="both"` when widgets should stretch.
+3. Use `expand=True` when a widget should take remaining space.
+
 ```python
 import customtkinter
 
@@ -604,6 +777,12 @@ app.mainloop()
 
 ### Place Layout (Absolute Positioning)
 
+**Step-by-step (absolute/relative):**
+
+1. Use `x/y` for pixel positioning.
+2. Use `relx/rely` for relative positioning (0.0 → 1.0).
+3. Prefer `anchor="center"` (or similar) so resizing behaves more predictably.
+
 ```python
 import customtkinter
 
@@ -621,6 +800,12 @@ app.mainloop()
 ```
 
 ### Responsive Design with Grid
+
+**Step-by-step (making the whole window responsive):**
+
+1. Give expanding rows/columns a `weight`.
+2. Apply `sticky="nsew"` so buttons/frames fill their cells.
+3. Verify resizing: drag the window and confirm your widgets expand rather than clumping.
 
 ```python
 import customtkinter
@@ -655,9 +840,26 @@ app.mainloop()
 
 ## Widget Reference
 
+Each widget section is designed to be used like a recipe:
+
+1. Read **Purpose** (what it’s for).
+2. Run the first example to confirm it works.
+3. Change **one parameter at a time** (width, colors, fonts) to learn what it does.
+4. Use **Key Parameters** as your “lookup table” while building real screens.
+
+Tip: when you’re unsure why a widget isn’t showing up, double-check you called a layout method (`grid/pack/place`) and that you used the intended parent (`master`).
+
 ### CTkButton
 
 **Purpose:** Clickable button with command callback
+
+**Step-by-step (typical usage):**
+
+1. Decide what should happen when the user clicks.
+2. Write a callback function (or `lambda` for a small action).
+3. Create the button: `customtkinter.CTkButton(parent, text=..., command=callback)`.
+4. Place it using `.pack(...)` or `.grid(...)`.
+5. In the callback, update the UI using `.configure(...)` or variables.
 
 ```python
 import customtkinter
@@ -725,6 +927,18 @@ toggle_btn.pack(pady=10)
 app.mainloop()
 ```
 
+```ctk-preview
+<div class="ctk-window" style="min-width:320px">
+  <div class="ctk-titlebar"><span class="ctk-win-dots"><span></span><span></span><span></span></span><span class="ctk-win-title">My Application</span></div>
+  <div class="ctk-body" style="align-items:center">
+    <span class="ctk-btn">Click Me</span>
+    <span class="ctk-btn" style="min-width:160px">Styled Button</span>
+    <span class="ctk-btn ctk-btn-disabled" style="min-width:160px">Disabled Button</span>
+    <span class="ctk-btn" style="min-width:190px">Toggle Button State</span>
+  </div>
+</div>
+```
+
 **Key Parameters:**
 
 | Parameter | Type | Description |
@@ -751,6 +965,13 @@ app.mainloop()
 ### CTkLabel
 
 **Purpose:** Display static text or images
+
+**Step-by-step (typical usage):**
+
+1. Use `text=` for static labels.
+2. For changing text, bind to a `StringVar` via `textvariable=`.
+3. Place the label.
+4. For multi-line text, set `wraplength=` and `justify=`.
 
 ```python
 import customtkinter
@@ -819,6 +1040,19 @@ update_btn.pack(pady=10)
 app.mainloop()
 ```
 
+```ctk-preview
+<div class="ctk-window" style="min-width:320px">
+  <div class="ctk-titlebar"><span class="ctk-win-dots"><span></span><span></span><span></span></span><span class="ctk-win-title">My Application</span></div>
+  <div class="ctk-body" style="align-items:center">
+    <span class="ctk-label">Simple Label</span>
+    <div class="ctk-label" style="background:#003d7a;padding:10px 20px;border-radius:6px;font-weight:700;font-size:16px">Styled Label</div>
+    <span class="ctk-label" style="line-height:1.6">This is a label with<br>multiple lines of text</span>
+    <span class="ctk-label" style="color:#6c7075">Transparent Label</span>
+    <span class="ctk-btn" style="min-width:140px">Update Label</span>
+  </div>
+</div>
+```
+
 **Key Parameters:**
 
 | Parameter | Type | Description |
@@ -837,6 +1071,14 @@ app.mainloop()
 ### CTkEntry
 
 **Purpose:** Single-line text input
+
+**Step-by-step (typical usage):**
+
+1. Create the entry, usually with `placeholder_text=`.
+2. Place it so it can expand (`fill="x"` or `sticky="ew"`).
+3. Read user input with `.get()` (commonly on a Submit button).
+4. Clear with `.delete(0, "end")` and write with `.insert(0, "...")`.
+5. Use `show="*"` for password fields.
 
 ```python
 import customtkinter
@@ -918,6 +1160,22 @@ clear_btn.pack(pady=10)
 app.mainloop()
 ```
 
+```ctk-preview
+<div class="ctk-window" style="min-width:340px">
+  <div class="ctk-titlebar"><span class="ctk-win-dots"><span></span><span></span><span></span></span><span class="ctk-win-title">My Application</span></div>
+  <div class="ctk-body">
+    <div class="ctk-entry"><span class="ctk-placeholder">Enter your name</span></div>
+    <div class="ctk-entry"><span class="ctk-placeholder">Email address</span></div>
+    <div class="ctk-entry"><span class="ctk-placeholder">Password &#8226;&#8226;&#8226;&#8226;&#8226;&#8226;</span></div>
+    <div class="ctk-row" style="gap:8px">
+      <span class="ctk-btn" style="min-width:90px">Get Value</span>
+      <span class="ctk-btn" style="min-width:90px">Set Value</span>
+      <span class="ctk-btn" style="min-width:80px">Clear</span>
+    </div>
+  </div>
+</div>
+```
+
 **Key Parameters:**
 
 | Parameter | Type | Description |
@@ -948,6 +1206,13 @@ app.mainloop()
 ### CTkTextbox
 
 **Purpose:** Multi-line text input and display
+
+**Step-by-step (typical usage):**
+
+1. Use `CTkTextbox` when you need paragraphs (notes, logs, JSON, etc.).
+2. Insert text with `.insert("end", "...")`.
+3. Read text with `.get("1.0", "end")` (Tk text widgets use line.column indices).
+4. If you want output-only text, disable editing by changing `state`.
 
 ```python
 import customtkinter
@@ -1008,6 +1273,19 @@ clear_btn.pack(pady=10)
 app.mainloop()
 ```
 
+```ctk-preview
+<div class="ctk-window" style="min-width:340px">
+  <div class="ctk-titlebar"><span class="ctk-win-dots"><span></span><span></span><span></span></span><span class="ctk-win-title">My Application</span></div>
+  <div class="ctk-body">
+    <div class="ctk-textbox">Enter text here...</div>
+    <div class="ctk-row" style="gap:8px">
+      <span class="ctk-btn" style="min-width:100px">Get Text</span>
+      <span class="ctk-btn" style="min-width:80px">Clear</span>
+    </div>
+  </div>
+</div>
+```
+
 **Key Parameters:**
 
 | Parameter | Type | Description |
@@ -1034,6 +1312,13 @@ app.mainloop()
 ### CTkFrame
 
 **Purpose:** Container for grouping widgets
+
+**Step-by-step (typical usage):**
+
+1. Create a frame to represent a logical “panel” (sidebar, header, form area).
+2. Place the frame in the window.
+3. Create child widgets with the frame as their parent.
+4. If using `grid` inside the frame, configure row/column weights for responsiveness.
 
 ```python
 import customtkinter
@@ -1086,6 +1371,17 @@ inner_label2.pack()
 app.mainloop()
 ```
 
+```ctk-preview
+<div class="ctk-window" style="min-width:360px">
+  <div class="ctk-titlebar"><span class="ctk-win-dots"><span></span><span></span><span></span></span><span class="ctk-win-title">My Application</span></div>
+  <div class="ctk-body">
+    <div class="ctk-frame"><span class="ctk-label">Frame 1 Content</span></div>
+    <div class="ctk-frame"><span class="ctk-label">Styled Frame</span><span class="ctk-btn" style="margin-top:6px">Button in Frame</span></div>
+    <div class="ctk-frame-row"><div class="ctk-frame"><span class="ctk-label">Left Section</span></div><div class="ctk-frame"><span class="ctk-label">Right Section</span></div></div>
+  </div>
+</div>
+```
+
 **Key Parameters:**
 
 | Parameter | Type | Description |
@@ -1101,6 +1397,13 @@ app.mainloop()
 ### CTkScrollableFrame
 
 **Purpose:** Frame with automatic scrollbar for overflow content
+
+**Step-by-step (typical usage):**
+
+1. Create the scrollable frame where content may exceed the visible height.
+2. Place it with expand/stretch enabled.
+3. Add child widgets to the scrollable frame exactly like a normal frame.
+4. For lists, use one row per item (labels/buttons) for the best scrolling UX.
 
 ```python
 import customtkinter
@@ -1137,6 +1440,25 @@ for i in range(20):
 app.mainloop()
 ```
 
+```ctk-preview
+<div class="ctk-window" style="min-width:320px">
+  <div class="ctk-titlebar"><span class="ctk-win-dots"><span></span><span></span><span></span></span><span class="ctk-win-title">My Application</span></div>
+  <div class="ctk-body">
+    <div class="ctk-scrollframe">
+      <div class="ctk-scrollframe-label">Scrollable Content</div>
+      <div class="ctk-scrollframe-content">
+        <span class="ctk-label">Item 1</span>
+        <span class="ctk-btn" style="min-width:120px">Button 1</span>
+        <span class="ctk-label">Item 2</span>
+        <span class="ctk-btn" style="min-width:120px">Button 2</span>
+        <span class="ctk-label">Item 3</span>
+      </div>
+      <div class="ctk-scrollbar-indicator"><div class="ctk-scrollbar-thumb"></div></div>
+    </div>
+  </div>
+</div>
+```
+
 **Key Parameters:**
 
 | Parameter | Type | Description |
@@ -1153,6 +1475,13 @@ app.mainloop()
 ### CTkSlider
 
 **Purpose:** Numeric input with slider control
+
+**Step-by-step (typical usage):**
+
+1. Set the range (`from_` and `to`).
+2. Use `command=` to receive live value changes.
+3. Display the value in a label (format floats if needed).
+4. Use `.set(value)` when you want to change it programmatically.
 
 ```python
 import customtkinter
@@ -1224,6 +1553,21 @@ slider2.set(0)
 app.mainloop()
 ```
 
+```ctk-preview
+<div class="ctk-window" style="min-width:360px">
+  <div class="ctk-titlebar"><span class="ctk-win-dots"><span></span><span></span><span></span></span><span class="ctk-win-title">My Application</span></div>
+  <div class="ctk-body">
+    <div class="ctk-slider"><div class="ctk-slider-track"></div><div class="ctk-slider-fill" style="width:40%"></div><div class="ctk-slider-thumb" style="left:40%"></div></div>
+    <div class="ctk-slider"><div class="ctk-slider-track"></div><div class="ctk-slider-fill" style="width:70%"></div><div class="ctk-slider-thumb" style="left:70%"></div></div>
+    <span class="ctk-label" style="color:#888;font-size:12px">Value: 0.0</span>
+    <div class="ctk-row" style="gap:8px">
+      <span class="ctk-btn" style="min-width:100px">Get Value</span>
+      <span class="ctk-btn" style="min-width:100px">Set to 50</span>
+    </div>
+  </div>
+</div>
+```
+
 **Key Parameters:**
 
 | Parameter | Type | Description |
@@ -1251,6 +1595,13 @@ app.mainloop()
 ### CTkProgressBar
 
 **Purpose:** Display progress indication
+
+**Step-by-step (typical usage):**
+
+1. Create the progress bar.
+2. For determinate progress, call `.set(x)` where $x\in[0,1]$.
+3. For “loading” states, use `.start()` / `.stop()`.
+4. If progress updates come from a long task, run that task off the UI thread (see Threading section).
 
 ```python
 import customtkinter
@@ -1299,6 +1650,17 @@ button.pack(pady=10)
 app.mainloop()
 ```
 
+```ctk-preview
+<div class="ctk-window" style="min-width:360px">
+  <div class="ctk-titlebar"><span class="ctk-win-dots"><span></span><span></span><span></span></span><span class="ctk-win-title">My Application</span></div>
+  <div class="ctk-body">
+    <div class="ctk-progress"><div class="ctk-progress-fill" style="width:50%"></div></div>
+    <div class="ctk-progress"><div class="ctk-progress-fill" style="width:75%;background:#00aa00"></div></div>
+    <span class="ctk-btn" style="min-width:160px">Animate Progress</span>
+  </div>
+</div>
+```
+
 **Key Parameters:**
 
 | Parameter | Type | Description |
@@ -1322,6 +1684,13 @@ app.mainloop()
 ### CTkCheckBox
 
 **Purpose:** Boolean toggle with label
+
+**Step-by-step (typical usage):**
+
+1. Create the checkbox with `text=`.
+2. Read its value with `.get()` (typically 0/1).
+3. Use `command=` to react instantly, or read the value on Save/Submit.
+4. Use `.select()` / `.deselect()` to set defaults.
 
 ```python
 import customtkinter
@@ -1385,6 +1754,20 @@ set_btn.pack(pady=10)
 app.mainloop()
 ```
 
+```ctk-preview
+<div class="ctk-window" style="min-width:280px">
+  <div class="ctk-titlebar"><span class="ctk-win-dots"><span></span><span></span><span></span></span><span class="ctk-win-title">My Application</span></div>
+  <div class="ctk-body">
+    <div class="ctk-checkbox-wrap"><div class="ctk-checkbox checked"></div><span class="ctk-label">Enable Feature</span></div>
+    <div class="ctk-checkbox-wrap"><div class="ctk-checkbox"></div><span class="ctk-label">Accept Terms</span></div>
+    <div class="ctk-row" style="gap:8px">
+      <span class="ctk-btn" style="min-width:100px">Get State</span>
+      <span class="ctk-btn" style="min-width:80px">Check</span>
+    </div>
+  </div>
+</div>
+```
+
 **Key Parameters:**
 
 | Parameter | Type | Description |
@@ -1415,6 +1798,12 @@ app.mainloop()
 ### CTkSwitch
 
 **Purpose:** Toggle switch for boolean values
+
+**Step-by-step (typical usage):**
+
+1. Create the switch with a `command=` callback.
+2. Inside the callback call `.get()` to read the new state.
+3. Use switches for “settings” toggles (dark mode, enable notifications, etc.).
 
 ```python
 import customtkinter
@@ -1477,6 +1866,20 @@ set_btn.pack(pady=10)
 app.mainloop()
 ```
 
+```ctk-preview
+<div class="ctk-window" style="min-width:280px">
+  <div class="ctk-titlebar"><span class="ctk-win-dots"><span></span><span></span><span></span></span><span class="ctk-win-title">My Application</span></div>
+  <div class="ctk-body">
+    <div class="ctk-switch-wrap"><div class="ctk-switch on"></div><span class="ctk-label">Dark Mode</span></div>
+    <div class="ctk-switch-wrap"><div class="ctk-switch"></div><span class="ctk-label">Notifications</span></div>
+    <div class="ctk-row" style="gap:8px">
+      <span class="ctk-btn" style="min-width:100px">Get State</span>
+      <span class="ctk-btn" style="min-width:90px">Turn On</span>
+    </div>
+  </div>
+</div>
+```
+
 **Key Parameters:**
 
 | Parameter | Type | Description |
@@ -1508,6 +1911,13 @@ app.mainloop()
 ### CTkRadioButton
 
 **Purpose:** Mutually exclusive selection option
+
+**Step-by-step (typical usage):**
+
+1. Create a shared variable (e.g. `IntVar` or `StringVar`).
+2. Create multiple radio buttons that share `variable=`.
+3. Give each radio a distinct `value=`.
+4. Read the selected value from the variable.
 
 ```python
 import customtkinter
@@ -1597,6 +2007,18 @@ button.pack(pady=10)
 app.mainloop()
 ```
 
+```ctk-preview
+<div class="ctk-window" style="min-width:280px">
+  <div class="ctk-titlebar"><span class="ctk-win-dots"><span></span><span></span><span></span></span><span class="ctk-win-title">My Application</span></div>
+  <div class="ctk-body">
+    <div class="ctk-radio-wrap"><div class="ctk-radio checked"></div><span class="ctk-label">Option 1</span></div>
+    <div class="ctk-radio-wrap"><div class="ctk-radio"></div><span class="ctk-label">Option 2</span></div>
+    <div class="ctk-radio-wrap"><div class="ctk-radio"></div><span class="ctk-label">Option 3</span></div>
+    <span class="ctk-btn" style="min-width:140px">Get Selection</span>
+  </div>
+</div>
+```
+
 **Key Parameters:**
 
 | Parameter | Type | Description |
@@ -1625,6 +2047,13 @@ app.mainloop()
 ### CTkComboBox
 
 **Purpose:** Dropdown selection with optional typing
+
+**Step-by-step (typical usage):**
+
+1. Provide options in `values=[...]`.
+2. Use `command=` to react to selection changes.
+3. Use `.get()` to read the current value.
+4. Update options later with `.configure(values=[...])`.
 
 ```python
 import customtkinter
@@ -1705,6 +2134,22 @@ update_btn.pack(pady=10)
 app.mainloop()
 ```
 
+```ctk-preview
+<div class="ctk-window" style="min-width:340px">
+  <div class="ctk-titlebar"><span class="ctk-win-dots"><span></span><span></span><span></span></span><span class="ctk-win-title">My Application</span></div>
+  <div class="ctk-body">
+    <div class="ctk-combobox"><span class="ctk-combobox-text">Option 1</span><span class="ctk-combobox-arrow">&#9660;</span></div>
+    <div class="ctk-combobox"><span class="ctk-combobox-text">Red</span><span class="ctk-combobox-arrow">&#9660;</span></div>
+    <div class="ctk-combobox"><span class="ctk-placeholder" style="flex:1;font-size:13px">No options loaded</span><span class="ctk-combobox-arrow">&#9660;</span></div>
+    <div class="ctk-row" style="gap:8px;flex-wrap:wrap">
+      <span class="ctk-btn" style="min-width:100px">Get Value</span>
+      <span class="ctk-btn" style="min-width:110px">Set to Blue</span>
+      <span class="ctk-btn" style="min-width:140px">Update Options</span>
+    </div>
+  </div>
+</div>
+```
+
 #### CTkComboBox Parameters & Methods
 
 | Parameter | Type | Description & Usage |
@@ -1738,6 +2183,13 @@ app.mainloop()
 ### CTkOptionMenu
 
 **Purpose:** Popup menu for selection
+
+**Step-by-step (typical usage):**
+
+1. Create a `StringVar` for the selected value (recommended).
+2. Create the option menu with `variable=` and `values=[...]`.
+3. Set defaults via the variable or `.set(...)`.
+4. Use `command=` for immediate action or read the variable on submit.
 
 ```python
 import customtkinter
@@ -1812,6 +2264,19 @@ update_btn.pack(pady=10)
 app.mainloop()
 ```
 
+```ctk-preview
+<div class="ctk-window" style="min-width:300px">
+  <div class="ctk-titlebar"><span class="ctk-win-dots"><span></span><span></span><span></span></span><span class="ctk-win-title">My Application</span></div>
+  <div class="ctk-body" style="align-items:flex-start">
+    <div class="ctk-combobox" style="width:180px"><span class="ctk-combobox-text">Option 1</span><span class="ctk-combobox-arrow">&#9660;</span></div>
+    <div class="ctk-combobox" style="width:200px;background:#003d7a;border-color:#0052a3"><span class="ctk-combobox-text">Medium</span><span class="ctk-combobox-arrow" style="color:#aaa">&#9660;</span></div>
+    <span class="ctk-btn" style="min-width:140px">Get Selection</span>
+    <div class="ctk-combobox" style="width:180px"><span class="ctk-combobox-text">Option 1</span><span class="ctk-combobox-arrow">&#9660;</span></div>
+    <span class="ctk-btn" style="min-width:140px">Update Menu</span>
+  </div>
+</div>
+```
+
 **Key Parameters:**
 
 | Parameter | Type | Description |
@@ -1841,6 +2306,13 @@ app.mainloop()
 ### CTkSegmentedButton
 
 **Purpose:** Multiple choice button group
+
+**Step-by-step (typical usage):**
+
+1. Pick a small set of choices that fit on one line.
+2. Store selection in a `StringVar`.
+3. Use `.get()` / `.set()` to read/change selection.
+4. Use it as a compact “mode switch” in toolbars.
 
 ```python
 import customtkinter
@@ -1896,6 +2368,17 @@ button.pack(pady=10)
 app.mainloop()
 ```
 
+```ctk-preview
+<div class="ctk-window" style="min-width:360px">
+  <div class="ctk-titlebar"><span class="ctk-win-dots"><span></span><span></span><span></span></span><span class="ctk-win-title">My Application</span></div>
+  <div class="ctk-body" style="align-items:center">
+    <div class="ctk-segmented"><span class="ctk-segment active">Option 1</span><span class="ctk-segment">Option 2</span><span class="ctk-segment">Option 3</span></div>
+    <div class="ctk-segmented"><span class="ctk-segment active">Light</span><span class="ctk-segment">Dark</span><span class="ctk-segment">Auto</span></div>
+    <span class="ctk-btn" style="min-width:120px">Get Theme</span>
+  </div>
+</div>
+```
+
 **Key Parameters:**
 
 | Parameter | Type | Description |
@@ -1919,6 +2402,13 @@ app.mainloop()
 ### CTkTabview
 
 **Purpose:** Tabbed interface
+
+**Step-by-step (typical usage):**
+
+1. Create the tab view and place it.
+2. Add tabs with `.add("...")`.
+3. Put widgets inside the tab container returned by `.tab("...")`.
+4. Keep each tab focused on one group of tasks/settings.
 
 ```python
 import customtkinter
@@ -2002,6 +2492,22 @@ button.pack(pady=10)
 app.mainloop()
 ```
 
+```ctk-preview
+<div class="ctk-window" style="min-width:380px">
+  <div class="ctk-titlebar"><span class="ctk-win-dots"><span></span><span></span><span></span></span><span class="ctk-win-title">My Application</span></div>
+  <div class="ctk-body">
+    <div class="ctk-tabview">
+      <div class="ctk-tabs"><span class="ctk-tab active">Tab 1</span><span class="ctk-tab">Tab 2</span><span class="ctk-tab">Tab 3</span></div>
+      <div class="ctk-tab-body">
+        <span class="ctk-label">Content for Tab 1</span>
+        <span class="ctk-btn" style="min-width:100px">Button 1</span>
+      </div>
+    </div>
+    <span class="ctk-btn" style="min-width:160px">Get Current Tab</span>
+  </div>
+</div>
+```
+
 **Key Parameters:**
 
 | Parameter | Type | Description |
@@ -2034,6 +2540,12 @@ app.mainloop()
 ### CTkScrollbar
 
 **Purpose:** Manual scrollbar control
+
+**Step-by-step (typical usage):**
+
+1. Prefer `CTkScrollableFrame` unless you need manual control.
+2. If wiring manually, connect the scrollbar to a scrollable widget (e.g. `CTkTextbox`).
+3. Ensure the scroll command is set correctly, otherwise the bar won’t move.
 
 ```python
 import customtkinter
@@ -2105,6 +2617,13 @@ app.mainloop()
 ### CTkImage
 
 **Purpose:** Load and display images
+
+**Step-by-step (typical usage):**
+
+1. Install Pillow (`pip install pillow`) if you load images from files.
+2. Create a `CTkImage(...)` (optionally provide light/dark versions).
+3. Pass the image into `CTkLabel`/`CTkButton` via `image=`.
+4. Store the image on `self` (or a module variable) to prevent garbage collection.
 
 ```python
 import customtkinter
@@ -2179,7 +2698,21 @@ app.mainloop()
 
 ## Event Handling & Callbacks
 
+Event handling in CustomTkinter follows Tkinter patterns:
+
+- `command=` callbacks are the simplest (buttons, switches, sliders, etc.).
+- `bind()` is for lower-level events (mouse enter/leave, key presses, right-click).
+
+**Keep your UI responsive:** callbacks run on the main UI thread, so do not do long work inside them. If you need to do heavy/slow work, move it to a background thread and schedule UI updates with `after()` (see Threading section).
+
 ### Button Commands
+
+**Step-by-step:**
+
+1. Write a function for what should happen on click.
+2. Pass the function *without calling it* (`command=on_click`, not `command=on_click()`).
+3. If you need arguments, wrap in `lambda: func(arg)`.
+4. Update widgets with `.configure(...)`.
 
 ```python
 import customtkinter
@@ -2244,6 +2777,15 @@ app.mainloop()
 
 ### Entry Commands
 
+Entries are commonly handled on **Submit** (button click) rather than on every keystroke.
+
+**Step-by-step:**
+
+1. Create the entry.
+2. On submit, call `entry.get()`.
+3. Validate and show an error if needed.
+4. Use `.delete(0, "end")` to clear after a successful submit.
+
 ```python
 import customtkinter
 
@@ -2283,6 +2825,12 @@ app.mainloop()
 
 ### Slider Commands
 
+**Step-by-step:**
+
+1. Create a label to show the current value.
+2. Create the slider with `command=on_change`.
+3. In `on_change(value)`, format and display the value.
+
 ```python
 import customtkinter
 
@@ -2307,6 +2855,12 @@ app.mainloop()
 ```
 
 ### CheckBox and Switch Commands
+
+**Step-by-step:**
+
+1. Create the checkbox/switch with a `command=`.
+2. In the callback, call `.get()` to read the state.
+3. Enable/disable other widgets or update configuration based on that state.
 
 ```python
 import customtkinter
@@ -2341,6 +2895,12 @@ app.mainloop()
 
 ### ComboBox Commands
 
+**Step-by-step:**
+
+1. Provide the list via `values=[...]`.
+2. Use `command=` for “react immediately”.
+3. Use `.get()` for “read later” (e.g. when saving a form).
+
 ```python
 import customtkinter
 
@@ -2361,6 +2921,14 @@ app.mainloop()
 ```
 
 ### Event Binding with bind()
+
+`bind()` gives you access to the underlying Tk event system.
+
+**Step-by-step:**
+
+1. Define handlers that accept an `event` parameter.
+2. Bind to a widget (`label.bind(...)`) for local events.
+3. Bind to the app (`app.bind(...)`) for global keyboard shortcuts.
 
 ```python
 import customtkinter
@@ -2423,7 +2991,16 @@ Window Events:
 
 ## Best Practices
 
+These recommendations make your apps easier to grow and maintain. You don’t need to apply all of them on day one — but they’re worth adopting early.
+
 ### 1. Use Classes for Complex Applications
+
+**Step-by-step (a scalable structure):**
+
+1. Subclass `customtkinter.CTk` for your main window.
+2. Put widget creation in one method (e.g. `setup_ui`).
+3. Store widgets you’ll update later on `self`.
+4. Keep callbacks as methods so they can access app state via `self`.
 
 ```python
 import customtkinter
@@ -2486,6 +3063,13 @@ if __name__ == "__main__":
 
 ### 2. Responsive Layout with Grid
 
+**Step-by-step:**
+
+1. Decide which rows/columns should stretch.
+2. Set `weight=1` on those rows/columns.
+3. Use `sticky="nsew"` on frames/panels that should expand.
+4. Re-test resizing after each new layout change.
+
 ```python
 import customtkinter
 
@@ -2531,6 +3115,13 @@ app.mainloop()
 
 ### 3. Data Validation
 
+**Step-by-step:**
+
+1. Read values from entries with `.get()`.
+2. Validate early and return on the first error.
+3. Explain what to fix (don’t just say “Invalid”).
+4. Only proceed when all required fields are valid.
+
 ```python
 import customtkinter
 from tkinter import messagebox
@@ -2575,6 +3166,13 @@ app.mainloop()
 ```
 
 ### 4. State Management
+
+**Step-by-step:**
+
+1. Keep your app state in one place (object or dict).
+2. Update the state in callbacks.
+3. Refresh UI from state in a dedicated method (`update_display`).
+4. Avoid scattering globals; it gets hard to debug as the app grows.
 
 ```python
 import customtkinter
@@ -2636,6 +3234,13 @@ if __name__ == "__main__":
 
 ### 5. Error Handling
 
+**Step-by-step:**
+
+1. Wrap risky operations in `try/except`.
+2. Catch known exceptions with specific messages.
+3. Show errors in the UI (e.g. `messagebox.showerror`).
+4. Keep the UI usable even after an error.
+
 ```python
 import customtkinter
 from tkinter import messagebox
@@ -2676,7 +3281,16 @@ app.mainloop()
 
 ## Common Patterns
 
+These are copy/paste-friendly patterns that show “the right way” to build common UX pieces in CustomTkinter.
+
 ### Modal Dialog
+
+**Step-by-step:**
+
+1. Create a `CTkToplevel` window.
+2. Call `.transient(app)` so it stays associated with the main window.
+3. Call `.grab_set()` to make it modal.
+4. Close it with `.destroy()`.
 
 ```python
 import customtkinter
@@ -2719,6 +3333,13 @@ app.mainloop()
 ```
 
 ### Loading Indicator
+
+**Step-by-step:**
+
+1. Create a label for status text.
+2. Create a `CTkProgressBar`.
+3. Update progress during work.
+4. For real long tasks, combine this with the Threading section so the UI doesn’t freeze.
 
 ```python
 import customtkinter
@@ -2769,6 +3390,13 @@ if __name__ == "__main__":
 ```
 
 ### Form Validation
+
+**Step-by-step:**
+
+1. Gather values from all fields.
+2. Validate required fields first.
+3. Convert types inside `try/except`.
+4. Show a single clear error at a time.
 
 ```python
 import customtkinter
@@ -2860,6 +3488,14 @@ if __name__ == "__main__":
 
 Creating custom widgets allows you to build reusable components that encapsulate both UI and behavior. This is especially useful for forms, dialogs, and repeated patterns in your application. By extending `CTkFrame`, you can combine multiple widgets into a single, easy-to-use component.
 
+**Step-by-step (turn repeated UI into a component):**
+
+1. Identify a chunk of UI you repeat (label+entry, card, toolbar, etc.).
+2. Subclass `CTkFrame`.
+3. Build the internal widgets in `__init__`.
+4. Expose a tiny public API (`get()`, `set()`, `configure(...)`) so the rest of your app doesn’t need to know the internals.
+5. Use your new class like any other widget: create it, then `pack/grid` it.
+
 ### Creating Reusable Components
 
 ```python
@@ -2902,6 +3538,13 @@ This example creates a reusable `CTkLabeledEntry` component that combines a labe
 Most applications need to remember user preferences and settings between sessions. By persisting configuration to a JSON file, you can reload settings when the application starts. This provides a seamless user experience where their customizations persist across runs.
 
 ### Saving and Loading Settings
+
+**Step-by-step (practical persistence):**
+
+1. Choose defaults (theme, appearance mode, window size).
+2. Load config on startup (use defaults if missing/corrupt).
+3. Update config when the user changes settings.
+4. Save back to JSON (pretty-printed with `indent=2` makes it readable).
 
 ```python
 import customtkinter
@@ -2954,9 +3597,17 @@ The `AppConfig` class provides a simple way to manage application settings. On i
 
 ## Threading & Long Operations
 
-Long-running operations (like file downloads, database queries, or heavy computations) can freeze your UI if they run on the main thread. Threading allows these operations to run in the background while keeping your UI responsive. However, you must update the UI from the main thread, so we use a callback pattern to communicate results.
+Long-running operations (like file downloads, database queries, or heavy computations) can freeze your UI if they run on the main thread. Threading lets you run that work in the background while keeping the UI responsive.
+
+**Important:** Tkinter/CustomTkinter widgets are **not thread-safe**. A worker thread must not call `.configure(...)` directly. Instead, schedule UI updates on the main thread using `after()`.
 
 ### Running Background Tasks
+
+**Step-by-step (safe pattern):**
+
+1. Start a daemon `threading.Thread` for the slow work.
+2. When work finishes, schedule the completion callback via `app.after(0, ...)`.
+3. Update UI only inside that scheduled callback.
 
 ```python
 import customtkinter
@@ -2965,13 +3616,14 @@ import time
 
 
 class BackgroundTask:
-    """Helper class for running functions in background threads"""
+    """Run work in a background thread and marshal results to the UI thread."""
     
-    def __init__(self, callback=None):
+    def __init__(self, ui_root, callback=None):
+        self.ui_root = ui_root
         self.callback = callback
     
     def run(self, func, *args):
-        """Execute function in daemon thread, call callback when complete"""
+        """Execute function in daemon thread, schedule callback when complete."""
         thread = threading.Thread(
             target=lambda: self._worker(func, args),
             daemon=True
@@ -2979,16 +3631,16 @@ class BackgroundTask:
         thread.start()
     
     def _worker(self, func, args):
-        """Worker method that executes the function and handles results"""
+        """Worker method that executes the function and schedules results."""
         try:
             result = func(*args)
             if self.callback:
-                # Callback runs with the result
-                self.callback(result)
+                # Schedule callback on UI thread
+                self.ui_root.after(0, self.callback, result)
         except Exception as e:
             if self.callback:
-                # Error passed to callback for handling
-                self.callback(f"Error: {str(e)}")
+                # Schedule error callback on UI thread
+                self.ui_root.after(0, self.callback, f"Error: {str(e)}")
 
 
 class TaskApp(customtkinter.CTk):
@@ -2998,7 +3650,7 @@ class TaskApp(customtkinter.CTk):
         super().__init__()
         self.geometry("500x300")
         # Initialize background task handler
-        self.task = BackgroundTask(self.on_complete)
+        self.task = BackgroundTask(self, self.on_complete)
         
         # Status label
         self.label = customtkinter.CTkLabel(
@@ -3039,13 +3691,20 @@ if __name__ == "__main__":
 
 #### How It Works
 
-The `BackgroundTask` class provides a thread-safe way to run long operations without freezing the UI. When you call `run()`, it executes your function in a daemon thread. Once the function completes, it calls the callback function with the result. This callback runs in the main thread, making it safe to update UI elements. The example shows a simple task that takes 3 seconds to complete—during that time, the UI remains responsive.
+The `BackgroundTask` class runs your function in a daemon thread. When it finishes, it uses `ui_root.after(0, ...)` to schedule the completion callback on the UI thread. Because the callback runs on the UI thread, it is safe to update widgets (like `self.label.configure(...)`). The example shows a task that takes 3 seconds — during that time, the UI remains responsive.
 
 ---
 
 ## Common Gotchas & Solutions
 
 These are patterns that commonly catch new CustomTkinter developers. Understanding these will save you hours of debugging.
+
+**Quick debugging checklist (use this before deep-diving):**
+
+1. Widget not visible: confirm it has a parent and you called `.pack()` / `.grid()` / `.place()`.
+2. Layout not expanding: set grid `weight` and use `sticky="nsew"`.
+3. UI freezes: move the long task to a background thread.
+4. Image disappears: store a reference on `self` (or a global) to prevent garbage collection.
 
 ### 1. Lambda Closure in Loops
 
@@ -3196,6 +3855,13 @@ CustomTkinter provides a complete toolkit for building modern desktop applicatio
 ✅ Configuration persistence  
 
 For more information, visit: <https://customtkinter.tomschimansky.com/documentation/>
+
+**Suggested next step (small project):** Build a settings window that combines multiple topics from this guide:
+
+1. Use `CTkTabview` with two tabs: “General” and “Appearance”.
+2. Add a `CTkSwitch` and a `CTkOptionMenu`.
+3. Persist the values using the Configuration section (JSON file).
+4. Apply theme/appearance mode on startup.
 
 ---
 

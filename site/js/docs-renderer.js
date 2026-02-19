@@ -89,6 +89,12 @@
   renderer.code = function (code, lang) {
     let text = typeof code === 'object' ? code.text : code;
     let language = typeof code === 'object' ? code.lang : lang;
+
+    // CTk widget preview — render raw HTML inside a styled wrapper
+    if (language === 'ctk-preview') {
+      return `<div class="ctk-preview-wrap">${text}</div>\n`;
+    }
+
     const langClass = language ? `language-${language}` : '';
     const escaped = text
       .replace(/&/g, '&amp;')
