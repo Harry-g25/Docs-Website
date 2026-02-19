@@ -45,6 +45,15 @@
 },
   ];
 
+  const assetVersion = (window.__ASSET_VERSION || '').toString().trim();
+  function withVersion(url) {
+    if (!assetVersion) return url;
+    if (!url) return url;
+    if (/\bv=/.test(url)) return url;
+    const joiner = url.includes('?') ? '&' : '?';
+    return `${url}${joiner}v=${encodeURIComponent(assetVersion)}`;
+  }
+
   // ── State ─────────────────────────────────────────────────
   let index = [];        // {doc, heading, anchor, content, level}
   let loaded = false;
@@ -142,7 +151,7 @@
     loadingPromise = Promise.all(
       DOCS.map(async (doc) => {
         try {
-          const res = await fetch(doc.mdPath);
+          const res = await fetch(withVersion(doc.mdPath), { cache: 'no-store' });
           if (!res.ok) return [];
           const md = await res.text();
           return parseMarkdown(md, doc);
@@ -275,7 +284,8 @@
       </div>`;
 
       for (const r of group.items) {
-        const url = `${r.entry.doc.htmlPage}#${r.entry.anchor}`;
+        const pageUrl = withVersion(r.entry.doc.htmlPage);
+        const url = `${pageUrl}#${r.entry.anchor}`;
         const snippet = extractSnippet(r.entry.content, query);
         const levelTag = r.entry.level <= 2 ? '' : `<span class="search-level">h${r.entry.level}</span>`;
 

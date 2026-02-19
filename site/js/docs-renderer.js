@@ -11,6 +11,15 @@
   const mdPath = config.mdPath || '../CUSTOMTKINTER_DOCUMENTATION.md';
   const docTitle = config.title || 'Documentation';
 
+  const assetVersion = (window.__ASSET_VERSION || '').toString().trim();
+  function withVersion(url) {
+    if (!assetVersion) return url;
+    if (!url) return url;
+    if (/\bv=/.test(url)) return url;
+    const joiner = url.includes('?') ? '&' : '?';
+    return `${url}${joiner}v=${encodeURIComponent(assetVersion)}`;
+  }
+
   // ---- Helpers ----
   const $ = (s, p) => (p || document).querySelector(s);
   const $$ = (s, p) => [...(p || document).querySelectorAll(s)];
@@ -35,8 +44,8 @@
     const hljsLink = $('#hljs-theme');
     if (hljsLink) {
       hljsLink.href = t === 'dark'
-        ? '../css/highlight-github-dark.min.css'
-        : '../css/highlight-github.min.css';
+        ? withVersion('../css/highlight-github-dark.min.css')
+        : withVersion('../css/highlight-github.min.css');
     }
 
     setTimeout(() => document.documentElement.classList.remove('theme-transition'), 350);
@@ -70,7 +79,7 @@
   // ===== 3. Fetch & render Markdown =====
   let md = '';
   try {
-    const res = await fetch(mdPath);
+    const res = await fetch(withVersion(mdPath), { cache: 'no-store' });
     if (!res.ok) throw new Error(res.statusText);
     md = await res.text();
   } catch (err) {
