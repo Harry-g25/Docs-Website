@@ -390,7 +390,7 @@ Text is the foundation of the web. HTML provides a rich set of elements for stru
 
 ### 3.1 Headings
 
-```html
+```html-live
 <h1>Page Title (one per page)</h1>
 <h2>Major Section</h2>
 <h3>Subsection</h3>
@@ -414,7 +414,7 @@ Headings are one of the most important structural elements in HTML. They do much
 
 ### 3.2 Paragraphs
 
-```html
+```html-live
 <p>This is a paragraph. Keep sentences clear and focused on one idea.</p>
 
 <p>
@@ -550,7 +550,7 @@ The convention for code blocks is to nest a `<code>` element inside `<pre>`. Thi
 
 ### 3.8 Address
 
-```html
+```html-live
 <address>
   Written by <a href="mailto:harry@example.com">Harry Gomm</a>.<br>
   Wall-Lag (Wales) Ltd<br>
@@ -568,7 +568,7 @@ Links are what make the web a web — they connect pages together. The `<a>` (an
 
 ### 4.1 Basic Link
 
-```html
+```html-live
 <a href="/about">About Us</a>
 ```
 
@@ -597,7 +597,7 @@ When you open a link in a new tab with `target="_blank"`, you create a potential
 
 ### 4.3 Anchor Links (same-page navigation)
 
-```html
+```html-live
 <!-- Link that scrolls to a section -->
 <a href="#installation">Jump to Installation</a>
 

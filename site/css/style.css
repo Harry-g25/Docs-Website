@@ -206,6 +206,17 @@ body{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;ba
 #content pre code .hljs-selector-class{color:#d19a66}
 #content pre code .hljs-type{color:#e5c07b}
 
+/* HTML live preview blocks (```html-live) */
+.html-live-wrap{margin:16px 0 24px;border-radius:12px;border:1px solid var(--border);overflow:hidden;background:var(--code-bg)}
+.html-live-wrap > pre{margin:0;border:0;border-radius:0}
+.html-live-wrap > pre code{border-radius:0}
+.html-live-output{border-top:1px solid var(--border);background:var(--content-bg)}
+.html-live-toolbar{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid var(--border);background:var(--search-bg)}
+.html-live-label{font-size:.85rem;font-weight:600;color:var(--content)}
+.html-live-stage{padding:12px;background:var(--content-bg)}
+.html-live-iframe{display:block;width:100%;height:280px;border:1px solid var(--border);border-radius:10px;background:transparent}
+.html-live-no-output{background:var(--code-bg)}
+
 [data-theme="light"] #content pre code .hljs-keyword{color:#a626a4}
 [data-theme="light"] #content pre code .hljs-string{color:#50a14f}
 [data-theme="light"] #content pre code .hljs-number{color:#986801}
@@ -527,6 +538,7 @@ html.theme-transition *::after{
   #content{box-shadow:none;border:none;padding:0;max-width:100%;font-size:12pt}
   #content pre{break-inside:avoid}
   #content table{break-inside:avoid}
+  .html-live-output{display:none !important}
   body{background:#fff;color:#000}
 }
 

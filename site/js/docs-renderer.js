@@ -31,6 +31,9 @@
   const backTop    = $('#back-to-top');
   const progressBar = $('#progress-bar');
 
+  const docId = (document.documentElement.getAttribute('data-doc') || '').toLowerCase();
+  const autoHtmlLive = docId.startsWith('html');
+
   // ===== 1. Theme Toggle =====
   function currentTheme() {
     return document.documentElement.getAttribute('data-theme') || 'dark';
@@ -95,25 +98,154 @@
 
   // Configure marked with a custom renderer
   const renderer = new marked.Renderer();
+  function escapeHtml(text) {
+    return (text || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function shouldShowHtmlOutput(source) {
+    const html = (source || '').toString();
+    if (!html.trim()) return false;
+
+    // DOM parse to decide if there's anything that would actually render.
+    // Important: ignore non-visual tags (style/script/head-ish) so we don't show
+    // blank output panels.
+    try {
+      const parser = new DOMParser();
+      const looksLikeFullDoc = /<!doctype\s+html/i.test(html) || /<html\b/i.test(html);
+      const doc = parser.parseFromString(
+        looksLikeFullDoc ? html : `<!doctype html><html><body>${html}</body></html>`,
+        'text/html'
+      );
+
+      const body = doc.body;
+      if (!body) return false;
+
+      // Remove elements whose text/content does not render.
+      body.querySelectorAll('script,style,noscript,template,meta,link,title,base').forEach(el => el.remove());
+
+      const text = (body.textContent || '').replace(/\s+/g, ' ').trim();
+      if (text.length) return true;
+
+      // Elements that normally create visible UI even without text.
+      // Note: intentionally exclude <br> and most empty structural elements.
+      if (body.querySelector('img,svg,canvas,video,audio,iframe,input,button,select,textarea')) return true;
+
+      // If there's inline styling or explicit sizing, it's likely visible.
+      // (e.g., <div style="width:100px;height:100px;background:red"></div>)
+      if (body.querySelector('[style]')) return true;
+      if (body.querySelector('[width],[height]')) return true;
+
+      return false;
+    } catch {
+      return false;
+    }
+  }
+
   renderer.code = function (code, lang) {
     let text = typeof code === 'object' ? code.text : code;
     let language = typeof code === 'object' ? code.lang : lang;
+    language = (language || '').toString().trim().toLowerCase();
 
     // CTk widget preview — render raw HTML inside a styled wrapper
     if (language === 'ctk-preview') {
       return `<div class="ctk-preview-wrap">${text}</div>\n`;
     }
 
+    // HTML live preview — render code + sandboxed output iframe
+    // Opt-in via ```html-live normally.
+    // Auto-enabled for HTML docs so every ```html block shows output.
+    if (language === 'html-live' || (autoHtmlLive && language === 'html')) {
+      const escaped = escapeHtml(text);
+      const showOutput = shouldShowHtmlOutput(text);
+      const encodedAttr = showOutput ? ` data-html-src="${encodeURIComponent(text)}"` : '';
+      const outputHtml = showOutput
+        ? `
+  <div class="html-live-output">
+    <div class="html-live-toolbar"><span class="html-live-label">Output</span></div>
+    <div class="html-live-stage">
+      <iframe class="html-live-iframe" title="Live HTML output" sandbox="allow-forms" referrerpolicy="no-referrer" loading="lazy"></iframe>
+    </div>
+  </div>`
+        : '';
+
+      return `
+<div class="html-live-wrap${showOutput ? '' : ' html-live-no-output'}">
+  <pre><code class="hljs language-html"${encodedAttr}>${escaped}</code></pre>${outputHtml}
+</div>\n`;
+    }
+
     const langClass = language ? `language-${language}` : '';
-    const escaped = text
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
+    const escaped = escapeHtml(text);
     return `<pre><code class="hljs ${langClass}">${escaped}</code></pre>\n`;
   };
 
   content.innerHTML = marked.parse(md, { gfm: true, breaks: true, renderer: renderer });
+
+  // ===== 3a. HTML live previews =====
+  // Populate iframe.srcdoc from the encoded source stored on the sibling <code>.
+  // To avoid massive long pages "loading forever", we lazy-populate outputs when
+  // they scroll near the viewport.
+  function buildPreviewSrcdoc(html) {
+    const looksLikeFullDoc = /<!doctype\s+html/i.test(html) || /<html\b/i.test(html);
+    if (looksLikeFullDoc) return html;
+
+    // Prevent relative URLs inside examples (e.g. <img src="foo.png">) from
+    // hammering the local server with 404s.
+    return `<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <base href="about:blank">
+  <style>
+    :root{color-scheme: light dark;}
+    html,body{background:transparent;}
+    body{margin:16px;}
+  </style>
+</head>
+<body>${html}</body>
+</html>`;
+  }
+
+  function populateHtmlLiveWrap(wrap) {
+    if (!wrap || wrap.dataset.htmlLiveReady === '1') return;
+
+    const codeEl = $('code[data-html-src]', wrap);
+    const iframe = $('iframe.html-live-iframe', wrap);
+    if (!codeEl || !iframe) return;
+
+    const encoded = (codeEl.getAttribute('data-html-src') || '').trim();
+    if (!encoded) return;
+
+    let html = '';
+    try {
+      html = decodeURIComponent(encoded);
+    } catch {
+      html = encoded;
+    }
+
+    iframe.srcdoc = buildPreviewSrcdoc(html);
+    wrap.dataset.htmlLiveReady = '1';
+  }
+
+  const htmlLiveWraps = $$('.html-live-wrap', content);
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries, obs) => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        populateHtmlLiveWrap(e.target);
+        obs.unobserve(e.target);
+      });
+    }, { rootMargin: '600px 0px' });
+
+    htmlLiveWraps.forEach(w => io.observe(w));
+  } else {
+    htmlLiveWraps.forEach(populateHtmlLiveWrap);
+  }
 
   // Run highlight.js on all code blocks
   $$('pre code', content).forEach(block => {
