@@ -1878,7 +1878,7 @@ The HTML parser has strict rules about which elements can contain which. The mos
 ## 21. Quick-Reference Cheatsheet
 
 ### Document Skeleton
-```
+```html
 <!DOCTYPE html>              Standards mode
 <html lang="en">             Root + language
 <head>                       Metadata
@@ -1886,7 +1886,7 @@ The HTML parser has strict rules about which elements can contain which. The mos
 ```
 
 ### Head Essentials
-```
+```html
 <meta charset="utf-8">       Encoding (first in head)
 <meta name="viewport" ...>   Mobile responsive
 <title>                       Tab/search title
@@ -1895,7 +1895,7 @@ The HTML parser has strict rules about which elements can contain which. The mos
 ```
 
 ### Semantic Layout
-```
+```html
 <header>     Page header / banner
 <nav>        Navigation links
 <main>       Primary content (one per page)
@@ -1906,7 +1906,7 @@ The HTML parser has strict rules about which elements can contain which. The mos
 ```
 
 ### Text
-```
+```html
 <h1>-<h6>    Heading hierarchy
 <p>          Paragraph
 <strong>     Strong importance (bold)
@@ -1917,7 +1917,7 @@ The HTML parser has strict rules about which elements can contain which. The mos
 ```
 
 ### Media
-```
+```html
 <img>        Image (always set alt)
 <picture>    Format/art-direction switching
 <video>      Video (use controls + track)
@@ -1927,7 +1927,7 @@ The HTML parser has strict rules about which elements can contain which. The mos
 ```
 
 ### Forms
-```
+```html
 <form>       Container (action + method)
 <label>      Input label (always use for=)
 <input>      Field (many types available)

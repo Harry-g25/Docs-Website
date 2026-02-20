@@ -19,7 +19,7 @@
   --content-color: #e2e8f0;
   --content-muted: #94a3b8;
   --code-bg:      #0f172a;
-  --code-color:   #e2e8f0;
+  --code-color:   #cbd5e1;
   --inline-code-bg: rgba(99,102,241,0.12);
   --inline-code-color: #a5b4fc;
   --border:       rgba(255,255,255,0.06);
@@ -189,22 +189,26 @@ body{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;ba
 #content code{font-family:'JetBrains Mono','Fira Code',Consolas,monospace;font-size:13.5px;background:var(--inline-code-bg);color:var(--inline-code-color);padding:2px 7px;border-radius:5px}
 #content pre{position:relative;margin:16px 0 24px;border-radius:10px;border:1px solid var(--border);overflow:hidden}
 #content pre code{display:block;padding:18px 20px;background:var(--code-bg);overflow-x:auto;line-height:1.6;font-size:13.5px;border-radius:0}
-#content pre code.hljs{background:var(--code-bg)}
-#content pre code .hljs-keyword{color:#c678dd}
-#content pre code .hljs-string{color:#98c379}
-#content pre code .hljs-number{color:#d19a66}
-#content pre code .hljs-built_in{color:#e5c07b}
-#content pre code .hljs-function{color:#61afef}
-#content pre code .hljs-title{color:#61afef}
-#content pre code .hljs-params{color:#abb2bf}
-#content pre code .hljs-comment{color:#5c6370;font-style:italic}
-#content pre code .hljs-doctag{color:#c678dd}
-#content pre code .hljs-meta{color:#56b6c2}
-#content pre code .hljs-attr{color:#d19a66}
-#content pre code .hljs-literal{color:#56b6c2}
-#content pre code .hljs-variable{color:#e06c75}
-#content pre code .hljs-selector-class{color:#d19a66}
-#content pre code .hljs-type{color:#e5c07b}
+#content pre code.hljs{background:var(--code-bg);color:var(--code-color) !important}
+/* Highlight.js uses .hljs-subst for plain text inside highlighted code blocks */
+#content pre code .hljs-subst{color:var(--code-color) !important}
+#content pre code .hljs-keyword{color:#c678dd !important}
+#content pre code .hljs-string{color:#98c379 !important}
+#content pre code .hljs-number{color:#d19a66 !important}
+#content pre code .hljs-built_in{color:#56b6c2 !important}
+#content pre code .hljs-symbol{color:#56b6c2 !important}
+#content pre code .hljs-bullet{color:#56b6c2 !important}
+#content pre code .hljs-function{color:#61afef !important}
+#content pre code .hljs-title{color:#61afef !important}
+#content pre code .hljs-params{color:#abb2bf !important}
+#content pre code .hljs-comment{color:#5c6370 !important;font-style:italic}
+#content pre code .hljs-doctag{color:#c678dd !important}
+#content pre code .hljs-meta{color:#56b6c2 !important}
+#content pre code .hljs-attr{color:#d19a66 !important}
+#content pre code .hljs-literal{color:#56b6c2 !important}
+#content pre code .hljs-variable{color:#e06c75 !important}
+#content pre code .hljs-selector-class{color:#d19a66 !important}
+#content pre code .hljs-type{color:#61afef !important}
 
 /* HTML live preview blocks (```html-live) */
 .html-live-wrap{margin:16px 0 24px;border-radius:12px;border:1px solid var(--border);overflow:hidden;background:var(--code-bg)}
@@ -217,18 +221,33 @@ body{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;ba
 .html-live-iframe{display:block;width:100%;height:280px;border:1px solid var(--border);border-radius:10px;background:transparent}
 .html-live-no-output{background:var(--code-bg)}
 
-[data-theme="light"] #content pre code .hljs-keyword{color:#a626a4}
-[data-theme="light"] #content pre code .hljs-string{color:#50a14f}
-[data-theme="light"] #content pre code .hljs-number{color:#986801}
-[data-theme="light"] #content pre code .hljs-built_in{color:#c18401}
-[data-theme="light"] #content pre code .hljs-function,[data-theme="light"] #content pre code .hljs-title{color:#4078f2}
-[data-theme="light"] #content pre code .hljs-params{color:#383a42}
-[data-theme="light"] #content pre code .hljs-comment{color:#a0a1a7;font-style:italic}
-[data-theme="light"] #content pre code .hljs-meta{color:#0184bc}
-[data-theme="light"] #content pre code .hljs-attr{color:#986801}
-[data-theme="light"] #content pre code .hljs-literal{color:#0184bc}
-[data-theme="light"] #content pre code .hljs-variable{color:#e45649}
-[data-theme="light"] #content pre code .hljs-type{color:#c18401}
+/* Output panels (```output / ```console / ```stderr) */
+.code-output-wrap{margin:16px 0 24px;border-radius:12px;border:1px solid var(--border);overflow:hidden;background:var(--code-bg)}
+.code-output-toolbar{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid var(--border);background:var(--search-bg)}
+.code-output-label{font-size:.85rem;font-weight:600;color:var(--content-muted)}
+.code-output-wrap > pre{margin:0;border:0;border-radius:0}
+.code-output-wrap > pre code{border-radius:0}
+.code-output-wrap .code-lang-label{display:none}
+
+/* Slight emphasis for stderr without introducing new colors */
+.code-output-wrap.code-output-stderr{border-left:4px solid var(--accent)}
+
+[data-theme="light"] #content pre code.hljs{color:var(--code-color) !important}
+[data-theme="light"] #content pre code .hljs-subst{color:var(--code-color) !important}
+[data-theme="light"] #content pre code .hljs-keyword{color:#a626a4 !important}
+[data-theme="light"] #content pre code .hljs-string{color:#50a14f !important}
+[data-theme="light"] #content pre code .hljs-number{color:#986801 !important}
+[data-theme="light"] #content pre code .hljs-built_in{color:#0184bc !important}
+[data-theme="light"] #content pre code .hljs-symbol{color:#0184bc !important}
+[data-theme="light"] #content pre code .hljs-bullet{color:#0184bc !important}
+[data-theme="light"] #content pre code .hljs-function,[data-theme="light"] #content pre code .hljs-title{color:#4078f2 !important}
+[data-theme="light"] #content pre code .hljs-params{color:#383a42 !important}
+[data-theme="light"] #content pre code .hljs-comment{color:#a0a1a7 !important;font-style:italic}
+[data-theme="light"] #content pre code .hljs-meta{color:#0184bc !important}
+[data-theme="light"] #content pre code .hljs-attr{color:#986801 !important}
+[data-theme="light"] #content pre code .hljs-literal{color:#0184bc !important}
+[data-theme="light"] #content pre code .hljs-variable{color:#e45649 !important}
+[data-theme="light"] #content pre code .hljs-type{color:#4078f2 !important}
 
 /* Copy button on code blocks */
 .copy-btn{position:absolute;top:8px;right:8px;background:var(--copy-btn-bg);border:1px solid var(--border);color:var(--content-muted);padding:4px 10px;border-radius:6px;font-size:12px;cursor:pointer;font-family:inherit;transition:background .15s,color .15s;z-index:2;display:flex;align-items:center;gap:4px}

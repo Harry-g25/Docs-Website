@@ -1,18 +1,44 @@
 # Python 3.14 — Learning & Reference Guide
 
+**Version:** 3.14.1 (Latest)  
+**Last Updated:** February 2026  
+**Official Docs:** [https://docs.python.org/3.14/](https://docs.python.org/3.14/)
+
 > A comprehensive, beginner-to-advanced Python learning resource and quick-reference guide.
 > Covers fundamentals, intermediate patterns, advanced techniques, recipes, and what's new in 3.14.
 
 ---
 
+## How to use this page (tutorial vs reference)
+
+This guide is intentionally a **single page**. Use these two “modes” so it stays findable.
+
+**Tutorial mode (learn in order):**
+1. Start at **Beginner Track** and work forward.
+2. After each major section, do a few exercises.
+3. Build 1–2 small projects (then come back for more).
+
+**Reference mode (jump around):**
+- Use the **TOC** + in-page search (`Ctrl+F`).
+- Use **Recipes** when you just need a snippet/pattern.
+- Use **Projects** when you want end-to-end structure.
+
+**Search tips (makes “everything in one place” usable):**
+- Search for module names like `pathlib`, `argparse`, `json`, `sqlite3`, `http.server`, `asyncio`.
+- Search for task words like `read file`, `regex`, `validate`, `cli`, `sqlite`, `server`.
+
+---
+
 ## Table of Contents
 
-- **Beginner Track** — Python Fundamentals (9 sections)
-- **Intermediate Track** — Levelling Up (5 sections)
-- **Advanced Track** — Professional Python (5 sections)
-- **Recipes & Quick-Reference Cheatsheets**
-- **What's New in Python 3.14**
-- **Appendix: Resources & Further Reading**
+- [Beginner Track — Python Fundamentals](#beginner-track-python-fundamentals)
+- [Intermediate Track — Levelling Up](#intermediate-track-levelling-up)
+- [Advanced Track — Professional Python](#advanced-track-professional-python)
+- [Exercises (with solutions)](#exercises-with-solutions)
+- [Projects & Case Studies (Standard Library Only)](#projects-case-studies-standard-library-only)
+- [Recipes & Quick-Reference Cheatsheets](#recipes-quick-reference-cheatsheets)
+- [What’s New in Python 3.14](#what-s-new-in-python-3-14)
+- [Appendix: Resources & Further Reading](#appendix-resources-further-reading)
 
 ---
 
@@ -20,6 +46,24 @@
 
 The beginner track takes you from zero to writing real Python scripts. Every section includes
 explanations, examples, common mistakes, and practice ideas.
+
+**Quick jump (Beginner Track):**
+
+| Section | Focus |
+|---|---|
+| [Getting Started: Installing Python & Running Code](#getting-started-installing-python-running-code) | Install, REPL, scripts |
+| [Understanding How Python Executes Your Code](#understanding-how-python-executes-your-code) | Execution model, bytecode, errors |
+| [Syntax, Variables & Fundamental Data Types](#syntax-variables-fundamental-data-types) | Numbers, strings, booleans, variables |
+| [Collections: Lists, Tuples, Dictionaries & Sets](#collections-lists-tuples-dictionaries-sets) | Core containers |
+| [Control Flow: Conditionals, Loops & Logic](#control-flow-conditionals-loops-logic) | if/for/while, truthiness |
+| [Functions: Building Reusable Code](#functions-building-reusable-code) | Parameters, returns, scope |
+| [Modules, Packages & Project Structure](#modules-packages-project-structure) | Imports, packages, layout |
+| [File I/O, Error Handling & Practice Projects](#file-i-o-error-handling-practice-projects) | Files, exceptions, mini-projects |
+| [Essential Fundamentals: Must-Know Python Basics](#essential-fundamentals-must-know-python-basics) | The “must stick” concepts |
+
+**Mode:** Tutorial = read sections top-to-bottom · Reference = use the quick jump table + `Ctrl+F`
+
+**Next:** [Intermediate Track — Levelling Up](#intermediate-track-levelling-up)
 
 ---
 
@@ -29,10 +73,10 @@ explanations, examples, common mistakes, and practice ideas.
 
 #### Installing Python
 
-1. Go to **https://www.python.org/downloads/** and download the latest Python 3.14.x installer.
+1. Go to [https://www.python.org/downloads/](https://www.python.org/downloads/) and download the latest Python 3.14.x installer.
 2. **Windows:** Run the installer. **Check** "Add Python to PATH" before clicking Install.
-3. **macOS:** Use the `.pkg` installer or Homebrew: `brew install python@3.14`.
-4. **Linux:** Most distros include Python. Otherwise: `sudo apt install python3.14` (Debian/Ubuntu).
+3. **macOS:** Use the `.pkg` installer or Homebrew (if available): `brew install python@3.14`.
+4. **Linux:** Most distros include Python, but they may not ship 3.14 immediately. For the simplest path, install your distro's default `python3`, or use **pyenv** to install Python 3.14 in your home directory.
 
 Verify the installation in a terminal:
 
@@ -40,6 +84,10 @@ Verify the installation in a terminal:
 python --version
 # Should print: Python 3.14.x
 ```
+
+> **Tip (Windows):** if `python` doesn't work, try `py --version` and `py -3.14 --version`.
+
+> **Tip (macOS/Linux):** you may need `python3 --version` depending on how Python is installed.
 
 #### The Python REPL (interactive shell)
 
@@ -78,6 +126,12 @@ python main.py
 ```
 
 You should see `Hello from Python 3.14!` printed.
+
+In these docs, we show example output like this:
+
+```output
+Hello from Python 3.14!
+```
 
 #### Choosing an editor
 
@@ -129,7 +183,7 @@ print("This will NEVER print")
 ```
 
 Output:
-```
+```stderr
 This will print
 This will also print
 Traceback (most recent call last):
@@ -148,7 +202,7 @@ def broken(    # <-- missing closing parenthesis
 ```
 
 Output:
-```
+```stderr
   File "main.py", line 2
     def broken(
               ^
@@ -1517,6 +1571,70 @@ print(f"\nTop student: {top} (avg: {averages[top]:.1f})")
 3. **Set operations**: Given two lists of student names from two classes, find students in both classes, only in class A, and only in class B.
 4. **Nested structure**: Build a dict representing a simple shopping cart where keys are product names and values are dicts with "price" and "quantity". Write a function to calculate the total.
 
+#### End-of-section exercises (with solutions)
+
+**Exercise A: Normalised word frequency**
+
+**Task:** Write `word_counts(text)` that returns a `dict[str, int]` counting words, case-insensitively, ignoring punctuation.
+
+<details>
+<summary>Solution</summary>
+
+```python
+from __future__ import annotations
+
+import re
+from collections import Counter
+
+
+def word_counts(text: str) -> dict[str, int]:
+    words = re.findall(r"[a-z0-9']+", text.lower())
+    return dict(Counter(words))
+
+
+def demo() -> None:
+    text = "Hello, hello! Isn't Python great? Python's great."
+    print(word_counts(text))
+
+
+if __name__ == "__main__":
+    demo()
+```
+
+</details>
+
+**Exercise B: Shopping cart total + unique items**
+
+**Task:** Given a cart like `{name: {"price": float, "quantity": int}}`, return `(total_cost, unique_item_count)`.
+
+<details>
+<summary>Solution</summary>
+
+```python
+from __future__ import annotations
+
+
+def cart_summary(cart: dict[str, dict[str, float | int]]) -> tuple[float, int]:
+    total = 0.0
+    for item in cart.values():
+        total += float(item["price"]) * int(item["quantity"])
+    return (round(total, 2), len(cart))
+
+
+def demo() -> None:
+    cart = {
+        "Apples": {"price": 0.40, "quantity": 6},
+        "Bread": {"price": 1.25, "quantity": 2},
+    }
+    print(cart_summary(cart))
+
+
+if __name__ == "__main__":
+    demo()
+```
+
+</details>
+
 ---
 
 ### Control Flow: Conditionals, Loops & Logic
@@ -1795,7 +1913,7 @@ for num in numbers:
 ```
 
 Output:
-```
+```output
 Checked 4...
 Checked 7...
 Checked 2...
@@ -1932,7 +2050,7 @@ for i in range(1, 6):
 ```
 
 Output:
-```
+```output
    1   2   3   4   5
    2   4   6   8  10
    3   6   9  12  15
@@ -2102,6 +2220,26 @@ menu_system()
 
 **Goal:** Encapsulate logic into reusable functions. Functions are the most important tool for organising your code — they let you name a piece of logic, test it independently, and reuse it everywhere.
 
+**Teaching idea to hold onto:** a function is a *named* chunk of code with a clear **inputs → work → outputs** shape.
+
+**Mental model: calling a function creates a fresh “local world”**
+
+When you call a function, Python:
+
+1. Creates a new **stack frame** (a fresh set of local variables).
+2. Assigns your arguments to the function’s parameters.
+3. Runs the function body top-to-bottom.
+4. Returns a value back to the caller (or returns `None` if you don’t `return`).
+
+This is why variables inside a function don’t “leak out” into the rest of your program.
+
+**Two beginner mistakes this fixes:**
+
+- Confusing `print()` with `return`: `print()` is for humans; `return` is for code.
+- Expecting a function to update outer variables “by default”: most of the time you should return the new value.
+
+**Rule of thumb:** Start by writing functions that behave like pure transformations (same inputs → same outputs), then add side-effects (printing, writing files, network calls) only where you actually need them.
+
 ---
 
 #### Why functions matter
@@ -2185,6 +2323,10 @@ print(find_first_negative([3, 7, 5]))      # None
 ---
 
 #### Parameters — every variation explained
+
+Parameters are the function’s **public interface**. They’re not just syntax — they’re how you communicate “how this function is meant to be used”.
+
+If you only remember one thing: **make the call-site readable**. Keyword-only parameters (using `*`) are a great tool for forcing clarity.
 
 **Positional arguments:**
 
@@ -2290,6 +2432,10 @@ connect("localhost", 8080, timeout=10)         # OK
 ---
 
 #### Scope — where variables live (LEGB rule)
+
+Scope rules are basically: **reading a name is a lookup**, **assigning to a name creates a local (unless you tell Python otherwise)**.
+
+That “assigning creates a local” part is why beginners hit `UnboundLocalError` when they *read* a variable and later *assign* to it in the same function.
 
 Python looks up variable names in this order:
 1. **L**ocal — inside the current function
@@ -2434,7 +2580,7 @@ def find_user(user_id: int) -> dict | None:
 **Benefits:**
 - Your editor gives better autocomplete and error detection.
 - Code is self-documenting.
-- Tools like `mypy` can catch type errors before you run your code.
+- Optional static type checkers can catch type errors before you run your code.
 
 ---
 
@@ -2685,11 +2831,104 @@ analyse(sample)
 4. **Higher-order functions**: Write a function `apply_to_all(func, items)` that applies a function to every item in a list and returns the results.
 5. **Compose functions**: Write `compose(f, g)` that returns a new function `h` where `h(x) = f(g(x))`.
 
+#### End-of-section exercises (with solutions)
+
+**Exercise A: Parse an int safely**
+
+**Task:** Write `parse_int(text, default=None)` that returns an `int` if possible, otherwise returns `default` (and never raises `ValueError`).
+
+<details>
+<summary>Solution</summary>
+
+```python
+from __future__ import annotations
+
+
+def parse_int(text: str, default: int | None = None) -> int | None:
+    try:
+        return int(text.strip())
+    except (AttributeError, ValueError):
+        return default
+
+
+def demo() -> None:
+    print(parse_int(" 42 "))
+    print(parse_int("not a number", default=0))
+
+
+if __name__ == "__main__":
+    demo()
+```
+
+</details>
+
+**Exercise B: Build a simple timer decorator**
+
+**Task:** Write a decorator `timed(fn)` that returns a wrapped function which returns `(result, elapsed_seconds)`.
+
+<details>
+<summary>Solution</summary>
+
+```python
+from __future__ import annotations
+
+from functools import wraps
+import time
+
+
+def timed(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        start = time.perf_counter()
+        result = fn(*args, **kwargs)
+        elapsed = time.perf_counter() - start
+        return result, elapsed
+    return wrapper
+
+
+@timed
+def slow_add(a: int, b: int) -> int:
+    time.sleep(0.05)
+    return a + b
+
+
+def demo() -> None:
+    value, seconds = slow_add(2, 3)
+    print(value)
+    print(f"took {seconds:.4f}s")
+
+
+if __name__ == "__main__":
+    demo()
+```
+
+</details>
+
 ---
 
 ### Modules, Packages & Project Structure
 
 **Goal:** Organise code across multiple files, install external packages, and structure real projects.
+
+**Mental model: `import` is “find the file → run it → reuse it”**
+
+An `import` is not just “copy/paste code”. Roughly, Python:
+
+1. **Finds** the module (searching folders listed in `sys.path`).
+2. **Executes** the module’s top-level code (once per process).
+3. Stores the module object in **`sys.modules`** so future imports reuse the already-loaded module.
+
+This explains a lot of real-world behaviour:
+
+- Importing a module can have **side effects** (because top-level code runs). Keep top-level code to definitions/constants.
+- “Why didn’t my module re-run?”: because it’s cached in `sys.modules`.
+- “Why does this only fail when I run a file directly?”: because running a file changes import context (see `python -m` below).
+
+**Common import gotchas (worth memorising):**
+
+- Don’t name your own files `json.py`, `random.py`, `email.py`, etc. You can shadow the standard library and get confusing import errors.
+- Circular imports happen when A imports B and B imports A at import time. Fix by moving imports into functions, or refactoring shared code into a third module.
+- If relative imports feel “random”, try running your entry point with `python -m package.module` so Python treats it as a package execution.
 
 ---
 
@@ -2730,7 +2969,7 @@ print(mu.area_circle(5))
 import math               # use as math.sqrt() — clear origin
 from math import sqrt     # use as sqrt() — convenient but less clear
 from math import *        # imports everything — AVOID (pollutes namespace)
-import numpy as np        # alias — standard convention for known libraries
+import datetime as dt     # alias — occasionally used for long module names
 ```
 
 ---
@@ -2831,16 +3070,18 @@ print(dict(groups))  # {'Engineering': ['Alice', 'Charlie'], 'Sales': ['Bob']}
 
 ---
 
-#### Installing external packages with pip
+#### Installing packages with pip (optional)
 
-**pip** is Python's package installer. It downloads packages from PyPI (Python Package Index):
+**pip** is Python's package installer. It downloads packages from PyPI (Python Package Index).
+
+This guide keeps its code examples **standard-library-only**, but you’ll still see `pip` in real projects for installing extra dependencies.
 
 ```bash
 # Install a package:
-pip install requests
+pip install <package-name>
 
 # Install a specific version:
-pip install requests==2.31.0
+pip install <package-name>==1.2.3
 
 # Install from a requirements file:
 pip install -r requirements.txt
@@ -2849,23 +3090,32 @@ pip install -r requirements.txt
 pip list
 
 # Show info about a package:
-pip show requests
+pip show <package-name>
 
 # Uninstall:
-pip uninstall requests
+pip uninstall <package-name>
 ```
 
-**Using installed packages:**
+**Example: making an HTTP request using the standard library (no install needed):**
 
 ```python
-import requests
+import json
+from urllib.request import Request, urlopen
 
-response = requests.get("https://api.github.com")
-print(response.status_code)  # 200
-print(response.json())       # parsed JSON data
+req = Request(
+    "https://api.github.com",
+    headers={"User-Agent": "python-urllib"},
+)
+
+with urlopen(req, timeout=10) as resp:
+    status = resp.status
+    payload = json.load(resp)
+
+print(status)                       # 200
+print(payload["current_user_url"])  # e.g. https://api.github.com/user
 ```
 
-**Popular packages to know about:**
+**Popular third-party packages to know about (not used in this guide’s examples):**
 
 | Package | Purpose |
 |---------|---------|
@@ -2897,7 +3147,7 @@ source .venv/bin/activate
 # (.venv) C:\my_project>
 
 # Install packages (go into .venv, not system-wide):
-pip install requests flask
+pip install -r requirements.txt
 
 # Save your dependencies:
 pip freeze > requirements.txt
@@ -2909,9 +3159,9 @@ deactivate
 **Your `requirements.txt` might look like:**
 
 ```text
-requests==2.31.0
-flask==3.0.0
-python-dotenv==1.0.0
+# Third-party dependencies (optional) go here, for example:
+# somepackage==1.2.3
+# anotherpackage==4.5.6
 ```
 
 **Workflow for a new project:**
@@ -2921,7 +3171,7 @@ mkdir my_project
 cd my_project
 python -m venv .venv
 .venv\Scripts\activate       # Windows
-pip install requests         # install what you need
+pip install -r requirements.txt  # install what you need
 pip freeze > requirements.txt
 ```
 
@@ -3189,9 +3439,97 @@ if __name__ == "__main__":
 #### Practice exercises
 
 1. **Module creation**: Create a `string_tools.py` module with functions: `reverse(s)`, `count_vowels(s)`, `is_palindrome(s)`. Import and use them from `main.py`.
-2. **Virtual env practice**: Create a new project with a virtual environment, install `requests`, and write a script that fetches a random joke from an API.
+2. **Virtual env practice (standard library only)**: Create a new project with a virtual environment and write a script that fetches a random joke from a JSON API using `urllib.request` + `json`.
 3. **Project scaffold**: Create a project with the medium structure above. Write a `config.py` with constants and a `utils/` package with at least two modules.
 4. **Standard library explorer**: Write a script that imports 5 different standard library modules and demonstrates one useful function from each.
+
+#### End-of-section exercises (with solutions)
+
+**Exercise A: Build `string_tools.py` + import it**
+
+**Task:** Create `string_tools.py` with `reverse`, `count_vowels`, and `is_palindrome`. Then import it from `main.py`.
+
+<details>
+<summary>Solution</summary>
+
+```python
+# string_tools.py
+from __future__ import annotations
+
+
+def reverse(s: str) -> str:
+    return s[::-1]
+
+
+def count_vowels(s: str) -> int:
+    vowels = set("aeiou")
+    return sum(1 for ch in s.lower() if ch in vowels)
+
+
+def is_palindrome(s: str) -> bool:
+    clean = "".join(ch.lower() for ch in s if ch.isalnum())
+    return clean == clean[::-1]
+```
+
+```python
+# main.py
+from __future__ import annotations
+
+import string_tools
+
+
+def demo() -> None:
+    text = "Never odd or even"
+    print(string_tools.reverse(text))
+    print(string_tools.count_vowels(text))
+    print(string_tools.is_palindrome(text))
+
+
+if __name__ == "__main__":
+    demo()
+```
+
+</details>
+
+**Exercise B: Fetch JSON via `urllib.request`**
+
+**Task:** Fetch JSON from a URL and print one field. Handle network errors cleanly.
+
+<details>
+<summary>Solution</summary>
+
+```python
+from __future__ import annotations
+
+import json
+from urllib.error import URLError
+from urllib.request import urlopen
+
+
+def fetch_json(url: str) -> object:
+    with urlopen(url, timeout=10) as resp:
+        data = resp.read().decode("utf-8")
+    return json.loads(data)
+
+
+def demo() -> None:
+    url = "https://official-joke-api.appspot.com/random_joke"
+    try:
+        payload = fetch_json(url)
+    except URLError as e:
+        print("Network error:", e)
+        return
+
+    if isinstance(payload, dict):
+        print(payload.get("setup"))
+        print(payload.get("punchline"))
+
+
+if __name__ == "__main__":
+    demo()
+```
+
+</details>
 
 ---
 
@@ -3315,6 +3653,15 @@ print(lines)  # ['Line 1\n', 'Line 2\n', 'Line 3\n']
 
 **The `with` statement (context manager):**
 
+Think of `with` as “set up → do work → always clean up”. The object after `with` controls the cleanup.
+
+Under the hood, Python calls two special methods:
+
+- `__enter__()` when the block starts (returns the value bound to `as ...`)
+- `__exit__(exc_type, exc, tb)` when the block ends (even if an exception happens)
+
+That’s why `with open(...)` is the standard way to work with files: it makes “close the file” automatic.
+
 The `with` statement ensures the file is properly closed even if an error occurs:
 
 ```python
@@ -3419,6 +3766,21 @@ for user in loaded["users"]:
 
 #### Exceptions — handling errors gracefully
 
+**Mental model: exceptions are “escape hatches” that unwind the call stack**
+
+When you `raise` an exception, Python stops normal execution and starts **unwinding the call stack** — it walks back up through function calls until it finds a matching `except` block.
+
+That means exceptions are great for:
+
+- Reporting errors from deep inside helper functions up to a place that can decide what to do.
+- Keeping happy-path code clean (EAFP: “try it, and handle failure”).
+
+And exceptions are usually a bad fit for:
+
+- Normal expected branching (e.g., “end of loop”) where a regular `if` is clearer.
+
+**Rule of thumb:** catch exceptions at the *boundary* of your program (CLI input, file load, network call), not everywhere.
+
 When something goes wrong, Python raises an **exception**:
 
 ```python
@@ -3445,6 +3807,19 @@ except ValueError:
     print("That's not a valid number!")
 except ZeroDivisionError:
     print("Can't divide by zero!")
+
+```
+
+**Common mistake:** `except Exception:` (too broad) can hide bugs. Prefer catching the specific error you actually expect.
+
+**Re-raising after adding context:** sometimes you want to log/annotate an error but still fail:
+
+```python
+def parse_age(text: str) -> int:
+    try:
+        return int(text)
+    except ValueError as e:
+        raise ValueError(f"Invalid age: {text!r}") from e
 ```
 
 **`try` / `except` / `else` / `finally`:**
@@ -3567,7 +3942,7 @@ def load_and_process():
 load_and_process()
 ```
 
-```
+```stderr
 Traceback (most recent call last):
   File "example.py", line 8, in <module>     <-- 3. Program started here
     load_and_process()
@@ -3808,6 +4183,109 @@ if __name__ == "__main__":
 4. **Config file parser**: Write a function that reads `key=value` format, returns a dict. Handle missing files and malformed lines.
 5. **Multi-file logger**: Write a logging module that appends timestamped messages to a log file. Use it from another script.
 
+#### End-of-section exercises (with solutions)
+
+**Exercise A: File word counter**
+
+**Task:** Given a text file path, print total lines, total words, and the 5 most common words.
+
+<details>
+<summary>Solution</summary>
+
+```python
+from __future__ import annotations
+
+import re
+from collections import Counter
+from pathlib import Path
+
+
+def file_word_report(path: str | Path) -> dict[str, object]:
+    path = Path(path)
+    text = path.read_text(encoding="utf-8")
+    lines = text.splitlines()
+
+    words = re.findall(r"[a-z0-9']+", text.lower())
+    counts = Counter(words)
+
+    return {
+        "lines": len(lines),
+        "words": len(words),
+        "unique_words": len(counts),
+        "top_5": counts.most_common(5),
+    }
+
+
+def demo() -> None:
+    p = Path("sample.txt")
+    p.write_text("Hello hello world\nHello again\n", encoding="utf-8")
+    try:
+        print(file_word_report(p))
+    finally:
+        p.unlink(missing_ok=True)
+
+
+if __name__ == "__main__":
+    demo()
+```
+
+</details>
+
+**Exercise B: `key=value` config parser**
+
+**Task:** Parse a config file where each non-empty, non-comment line is `key=value`. Return a dict.
+
+<details>
+<summary>Solution</summary>
+
+```python
+from __future__ import annotations
+
+from pathlib import Path
+
+
+def parse_kv_config(path: str | Path) -> dict[str, str]:
+    path = Path(path)
+    result: dict[str, str] = {}
+
+    for raw_line in path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
+            continue
+        if "=" not in line:
+            raise ValueError(f"Malformed line: {raw_line!r}")
+
+        key, value = line.split("=", 1)
+        key = key.strip()
+        value = value.strip()
+        if not key:
+            raise ValueError(f"Missing key: {raw_line!r}")
+
+        result[key] = value
+
+    return result
+
+
+def demo() -> None:
+    p = Path("app.conf")
+    p.write_text("""
+    # Example config
+    host=localhost
+    port=8080
+    debug=true
+    """.strip() + "\n", encoding="utf-8")
+    try:
+        print(parse_kv_config(p))
+    finally:
+        p.unlink(missing_ok=True)
+
+
+if __name__ == "__main__":
+    demo()
+```
+
+</details>
+
 ---
 
 ### Essential Fundamentals: Must-Know Python Basics
@@ -3961,11 +4439,28 @@ def area_circle(radius: float) -> float:
 
 These habits make your code look like "normal" Python and make it easier to read tutorials and other people's code.
 
+**Checkpoint (end of Beginner Track):** Do a few [Beginner exercises](#beginner-exercises), then continue: [Intermediate Track — Levelling Up](#intermediate-track-levelling-up).  
+**In a hurry?** Jump to [Recipes](#recipes-quick-reference-cheatsheets) or [Projects](#projects-case-studies-standard-library-only).
+
 ---
 
 ## Intermediate Track — Levelling Up
 
 Now that you've mastered the basics, the intermediate track focuses on writing production‑quality code: better organization, testing, working with data, and using Python's vast standard library.
+
+**Quick jump (Intermediate Track):**
+
+| Section | Focus |
+|---|---|
+| [Advanced Function Techniques](#advanced-function-techniques) | Decorators, generators, signatures |
+| [Deep Dive: Modules, Imports & Package Development](#deep-dive-modules-imports-package-development) | Packaging, imports, structure |
+| [Error Handling, Testing & Debugging Mastery](#error-handling-testing-debugging-mastery) | unittest, debugging workflow |
+| [Working with Files, Databases & Data Formats](#working-with-files-databases-data-formats) | sqlite3, json/csv, persistence |
+| [Python Standard Library: Essential Modules](#python-standard-library-essential-modules) | “best of stdlib” toolkit |
+
+**Mode:** Tutorial = read sections top-to-bottom · Reference = use the quick jump table + `Ctrl+F`
+
+**Next:** [Advanced Track — Professional Python](#advanced-track-professional-python)
 
 
 ### Advanced Function Techniques
@@ -4571,8 +5066,8 @@ Build a registry of plugins that can be loaded and executed dynamically.
 """
 plugin_system.py — A simple plugin architecture using decorators.
 
-This pattern is used in real frameworks like Flask (@app.route),
-pytest (@pytest.fixture), and Click (@click.command).
+This pattern is used in lots of real projects (web routing decorators,
+test fixtures, CLI command decorators, and plugin discovery systems).
 """
 import functools
 
@@ -4831,8 +5326,8 @@ from os.path import join, exists
 join("a", "b")                 # shorter, but less obvious origin
 
 # Style 3: Import with alias
-import numpy as np             # common convention for large libraries
-import pandas as pd
+import datetime as dt          # alias can shorten long module names
+import pathlib as pl
 
 # Style 4: Wildcard import (AVOID in production code)
 from os.path import *          # imports everything — pollutes namespace
@@ -4841,7 +5336,7 @@ from os.path import *          # imports everything — pollutes namespace
 **Best practices:**
 - Prefer `import module` for standard library and large packages.
 - Use `from module import name` when you use a specific name many times.
-- Use aliases (`as`) only for widely-accepted conventions (`np`, `pd`, `plt`).
+- Use aliases (`as`) sparingly (usually when it improves readability).
 - **Never** use `from x import *` in production code — it makes it impossible to track where names come from.
 
 ---
@@ -5027,17 +5522,10 @@ description = "A short description of your tool"
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.10"
-dependencies = [
-    "requests>=2.28",
-    "click>=8.0",
-]
+dependencies = []  # stdlib-only examples in this guide
 
 [project.optional-dependencies]
-dev = [
-    "pytest>=7.0",
-    "black",
-    "mypy",
-]
+dev = []  # add optional tooling deps if you want (outside stdlib)
 
 [project.scripts]
 awesome = "awesome_tool.cli:main"    # creates 'awesome' command
@@ -5053,7 +5541,7 @@ pip install -e .
 pip install -e ".[dev]"
 
 # Build distribution files
-pip install build
+pip install build            # optional (third-party helper)
 python -m build
 # Creates dist/awesome_tool-1.0.0.tar.gz and dist/awesome_tool-1.0.0-py3-none-any.whl
 ```
@@ -5075,7 +5563,7 @@ python -m venv .venv
 source .venv/bin/activate
 
 # Your prompt changes to show the active venv:
-# (.venv) $ pip install requests
+# (.venv) $ pip install -r requirements.txt
 
 # Deactivate when done
 deactivate
@@ -5094,10 +5582,9 @@ pip install -r requirements.txt
 **Example `requirements.txt`:**
 
 ```text
-requests==2.31.0
-click==8.1.7
-rich>=13.0,<14.0
-python-dotenv~=1.0.0
+# Third-party deps (optional) go here, for example:
+# somepackage==1.2.3
+# anotherpackage>=4.0,<5.0
 ```
 
 **Version specifiers:**
@@ -5409,7 +5896,7 @@ def main(numbers):
 
 ### Error Handling, Testing & Debugging Mastery
 
-**Goal:** Write robust, testable, and debuggable code. Master exception handling, build reliable test suites with pytest, and learn systematic debugging techniques.
+**Goal:** Write robust, testable, and debuggable code. Master exception handling, build reliable test suites with `unittest`, and learn systematic debugging techniques.
 
 ---
 
@@ -5731,141 +6218,11 @@ if __name__ == "__main__":
 
 ---
 
-#### Testing with `pytest` — the modern way
+#### (Optional) `pytest`
 
-`pytest` is more concise, more powerful, and the standard for most Python projects.
+`pytest` is a popular third-party test runner.
 
-**Install:** `pip install pytest`
-
-**Basic tests — just use `assert`:**
-
-```python
-# test_math_ops.py
-
-def add(a, b):
-    return a + b
-
-def test_add_positive():
-    assert add(2, 3) == 5
-
-def test_add_negative():
-    assert add(-1, -1) == -2
-
-def test_add_returns_int():
-    assert isinstance(add(1, 2), int)
-```
-
-Run: `pytest test_math_ops.py -v`
-
-**Testing exceptions:**
-
-```python
-import pytest
-
-def divide(a, b):
-    if b == 0:
-        raise ValueError("Cannot divide by zero")
-    return a / b
-
-def test_divide_by_zero():
-    with pytest.raises(ValueError, match="Cannot divide by zero"):
-        divide(10, 0)
-```
-
-**Parametrized tests — run the same test with different data:**
-
-```python
-import pytest
-
-def is_palindrome(s):
-    s = s.lower().replace(" ", "")
-    return s == s[::-1]
-
-@pytest.mark.parametrize("text, expected", [
-    ("racecar", True),
-    ("hello", False),
-    ("A man a plan a canal Panama", True),
-    ("", True),
-    ("a", True),
-    ("ab", False),
-])
-def test_is_palindrome(text, expected):
-    assert is_palindrome(text) == expected
-```
-
-**Fixtures — reusable test setup:**
-
-```python
-import pytest
-import json
-from pathlib import Path
-
-@pytest.fixture
-def sample_users():
-    """Provide sample user data for tests."""
-    return [
-        {"name": "Alice", "age": 30, "active": True},
-        {"name": "Bob", "age": 25, "active": False},
-        {"name": "Charlie", "age": 35, "active": True},
-    ]
-
-@pytest.fixture
-def temp_json_file(tmp_path, sample_users):
-    """Create a temporary JSON file with sample data."""
-    filepath = tmp_path / "users.json"
-    filepath.write_text(json.dumps(sample_users))
-    return filepath
-
-def test_load_users(temp_json_file):
-    """Test loading users from a JSON file."""
-    data = json.loads(temp_json_file.read_text())
-    assert len(data) == 3
-    assert data[0]["name"] == "Alice"
-
-def test_filter_active_users(sample_users):
-    """Test filtering for active users."""
-    active = [u for u in sample_users if u["active"]]
-    assert len(active) == 2
-    assert all(u["active"] for u in active)
-```
-
-**Fixture scopes:**
-
-```python
-@pytest.fixture(scope="function")   # default: runs for each test
-def per_test():
-    return []
-
-@pytest.fixture(scope="module")     # runs once per test file
-def db_connection():
-    conn = create_connection()
-    yield conn           # yield = teardown happens after
-    conn.close()
-
-@pytest.fixture(scope="session")    # runs once for entire test suite
-def app_config():
-    return load_config()
-```
-
-**Markers — categorize and select tests:**
-
-```python
-import pytest
-
-@pytest.mark.slow
-def test_large_computation():
-    """This test takes a long time."""
-    result = sum(range(100_000_000))
-    assert result > 0
-
-@pytest.mark.integration
-def test_api_call():
-    """Requires network access."""
-    pass
-
-# Run only slow tests:   pytest -m slow
-# Skip slow tests:       pytest -m "not slow"
-```
+This guide stays **standard-library-only**, so the examples use `unittest` + `unittest.mock`. If you later adopt `pytest`, the core skills (arrange/act/assert, isolating side effects with mocks, testing error paths, structuring test suites) transfer directly.
 
 ---
 
@@ -5875,13 +6232,14 @@ def test_api_call():
 
 ```python
 # api_client.py
-import requests
+import json
+from urllib.request import urlopen
 
 def get_user(user_id):
     """Fetch user from API."""
-    response = requests.get(f"https://api.example.com/users/{user_id}")
-    response.raise_for_status()
-    return response.json()
+    url = f"https://api.example.com/users/{user_id}"
+    with urlopen(url, timeout=10) as resp:
+        return json.load(resp)
 
 def get_username(user_id):
     """Get just the username."""
@@ -5895,37 +6253,43 @@ from unittest.mock import patch, MagicMock
 from api_client import get_username
 
 def test_get_username():
-    # Create a mock response object
-    mock_response = MagicMock()
-    mock_response.json.return_value = {
-        "id": 1,
-        "username": "alice",
-        "email": "alice@example.com"
-    }
-    mock_response.raise_for_status.return_value = None
+    # Create a mock HTTP response object
+    mock_resp = MagicMock()
+    mock_resp.__enter__.return_value = mock_resp
+    mock_resp.read.return_value = b'{"id": 1, "username": "alice", "email": "alice@example.com"}'
 
-    # Patch requests.get to return our mock
-    with patch("api_client.requests.get", return_value=mock_response) as mock_get:
+    # Patch urlopen to return our mock
+    with patch("api_client.urlopen", return_value=mock_resp) as mock_urlopen:
         result = get_username(1)
 
         assert result == "alice"
-        mock_get.assert_called_once_with("https://api.example.com/users/1")
+        mock_urlopen.assert_called_once_with("https://api.example.com/users/1", timeout=10)
 ```
 
 **Patching with decorators:**
 
 ```python
 from unittest.mock import patch
+from urllib.error import HTTPError
 import api_client
 
-@patch("api_client.requests.get")
-def test_get_user_error(mock_get):
+@patch("api_client.urlopen")
+def test_get_user_error(mock_urlopen):
     """Test that HTTP errors are propagated."""
-    mock_get.return_value.raise_for_status.side_effect = Exception("500 Server Error")
+    mock_urlopen.side_effect = HTTPError(
+        url="https://api.example.com/users/999",
+        code=500,
+        msg="Server Error",
+        hdrs=None,
+        fp=None,
+    )
 
-    import pytest
-    with pytest.raises(Exception, match="500"):
+    try:
         api_client.get_user(999)
+    except HTTPError as exc:
+        assert exc.code == 500
+    else:
+        raise AssertionError("Expected HTTPError")
 ```
 
 **Mocking file operations:**
@@ -6096,62 +6460,67 @@ class URLShortener:
 ```python
 # test_url_shortener.py
 """TDD tests for URL shortener — written BEFORE the implementation."""
-import pytest
+import unittest
 from url_shortener import URLShortener
 
-@pytest.fixture
-def shortener():
-    return URLShortener(domain="http://short.ly")
+class TestURLShortener(unittest.TestCase):
+    def setUp(self):
+        self.shortener = URLShortener(domain="http://short.ly")
 
-class TestShorten:
-    def test_returns_short_url(self, shortener):
-        result = shortener.shorten("https://www.example.com/very/long/path")
-        assert result.startswith("http://short.ly/")
-        assert len(result.split("/")[-1]) == 6
+    def test_returns_short_url(self):
+        result = self.shortener.shorten("https://www.example.com/very/long/path")
+        self.assertTrue(result.startswith("http://short.ly/"))
+        self.assertEqual(len(result.split("/")[-1]), 6)
 
-    def test_same_url_gives_same_code(self, shortener):
+    def test_same_url_gives_same_code(self):
         url = "https://www.example.com/page"
-        result1 = shortener.shorten(url)
-        result2 = shortener.shorten(url)
-        assert result1 == result2
+        result1 = self.shortener.shorten(url)
+        result2 = self.shortener.shorten(url)
+        self.assertEqual(result1, result2)
 
-    def test_different_urls_give_different_codes(self, shortener):
-        r1 = shortener.shorten("https://example.com/a")
-        r2 = shortener.shorten("https://example.com/b")
-        assert r1 != r2
+    def test_different_urls_give_different_codes(self):
+        r1 = self.shortener.shorten("https://example.com/a")
+        r2 = self.shortener.shorten("https://example.com/b")
+        self.assertNotEqual(r1, r2)
 
-    def test_invalid_url_raises(self, shortener):
-        with pytest.raises(ValueError, match="Invalid URL"):
-            shortener.shorten("not-a-url")
+    def test_invalid_url_raises(self):
+        with self.assertRaisesRegex(ValueError, "Invalid URL"):
+            self.shortener.shorten("not-a-url")
 
-    def test_empty_url_raises(self, shortener):
-        with pytest.raises(ValueError):
-            shortener.shorten("")
+    def test_empty_url_raises(self):
+        with self.assertRaises(ValueError):
+            self.shortener.shorten("")
 
-class TestResolve:
-    def test_resolve_known_url(self, shortener):
+    def test_resolve_known_url(self):
         original = "https://www.python.org"
-        short = shortener.shorten(original)
-        assert shortener.resolve(short) == original
+        short = self.shortener.shorten(original)
+        self.assertEqual(self.shortener.resolve(short), original)
 
-    def test_resolve_unknown_raises(self, shortener):
-        with pytest.raises(KeyError, match="not found"):
-            shortener.resolve("http://short.ly/zzzzzz")
+    def test_resolve_unknown_raises(self):
+        try:
+            self.shortener.resolve("http://short.ly/zzzzzz")
+        except KeyError as exc:
+            self.assertIn("not found", str(exc))
+        else:
+            raise AssertionError("Expected KeyError")
 
-class TestCount:
-    def test_starts_empty(self, shortener):
-        assert shortener.count == 0
+    def test_starts_empty(self):
+        self.assertEqual(self.shortener.count, 0)
 
-    def test_count_after_additions(self, shortener):
-        shortener.shorten("https://a.com")
-        shortener.shorten("https://b.com")
-        shortener.shorten("https://a.com")  # duplicate
-        assert shortener.count == 2
+    def test_count_after_additions(self):
+        self.shortener.shorten("https://a.com")
+        self.shortener.shorten("https://b.com")
+        self.shortener.shorten("https://a.com")  # duplicate
+        self.assertEqual(self.shortener.count, 2)
 
-# Run: pytest test_url_shortener.py -v
+
+if __name__ == "__main__":
+    unittest.main()
+
+# Run: python -m unittest test_url_shortener.py -v
 ```
 
-**What you practised:** TDD workflow (test first, implement, refactor), pytest fixtures, `pytest.raises`, class-based test organization, parametrized assertions.
+**What you practised:** TDD workflow (test first, implement, refactor), `unittest` assertions, `assertRaises`/`assertRaisesRegex`, and structuring tests with `setUp`.
 
 ---
 
@@ -6323,6 +6692,89 @@ if __name__ == "__main__":
 ```
 
 **What you practised:** Custom exception hierarchy, exception chaining, context managers, logging, CSV processing, `pathlib`, validation patterns, `finally` cleanup.
+
+#### End-of-section exercises (with solutions)
+
+**Exercise A: Custom exception + chaining**
+
+**Task:** Write `read_json(path)` that raises `DataLoadError` if JSON is invalid, and chains the original exception.
+
+<details>
+<summary>Solution</summary>
+
+```python
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+
+class DataLoadError(Exception):
+    pass
+
+
+def read_json(path: str | Path) -> object:
+    path = Path(path)
+    try:
+        raw = path.read_text(encoding="utf-8")
+        return json.loads(raw)
+    except json.JSONDecodeError as e:
+        raise DataLoadError(f"Invalid JSON in {path}") from e
+
+
+def demo() -> None:
+    p = Path("bad.json")
+    p.write_text("{not valid}", encoding="utf-8")
+    try:
+        read_json(p)
+    except DataLoadError as e:
+        print("Caught:", e)
+    finally:
+        p.unlink(missing_ok=True)
+
+
+if __name__ == "__main__":
+    demo()
+```
+
+</details>
+
+**Exercise B: A tiny `unittest` suite**
+
+**Task:** Write tests for `parse_int(text, default=None)` (from earlier) covering whitespace, invalid input, and negative numbers.
+
+<details>
+<summary>Solution</summary>
+
+```python
+from __future__ import annotations
+
+import unittest
+
+
+def parse_int(text: str, default: int | None = None) -> int | None:
+    try:
+        return int(text.strip())
+    except (AttributeError, ValueError):
+        return default
+
+
+class TestParseInt(unittest.TestCase):
+    def test_whitespace(self):
+        self.assertEqual(parse_int("  10  "), 10)
+
+    def test_invalid_returns_default(self):
+        self.assertEqual(parse_int("nope", default=0), 0)
+
+    def test_negative(self):
+        self.assertEqual(parse_int("-7"), -7)
+
+
+if __name__ == "__main__":
+    unittest.main()
+```
+
+</details>
 
 ---
 
@@ -6671,12 +7123,11 @@ version = "1.0.0"
 description = "A sample application"
 
 [project.dependencies]
-requests = ">=2.28"
-click = ">=8.0"
+# Third-party deps would go here, for example:
+# somepackage = ">=1.2"
 
-[tool.pytest]
-testpaths = ["tests"]
-verbose = true
+[tool.myapp]
+debug = true
 
 [database]
 host = "localhost"
@@ -6688,14 +7139,14 @@ name = "myapp_db"
 config = tomllib.loads(toml_content)
 print(config["project"]["name"])        # my-app
 print(config["database"]["port"])       # 5432
-print(config["tool"]["pytest"]["verbose"])  # True
+print(config["tool"]["myapp"]["debug"])  # True
 
 # Parse from file
 # with open("pyproject.toml", "rb") as f:   # note: "rb" (binary mode!)
 #     config = tomllib.load(f)
 ```
 
-For writing TOML, use the third-party `tomli-w` package: `pip install tomli-w`.
+The standard library provides `tomllib` for reading TOML, but it does not include a TOML writer.
 
 ---
 
@@ -8228,11 +8679,28 @@ if __name__ == "__main__":
 
 **What you practised:** `namedtuple`, `groupby`, `accumulate`, `Counter`, `defaultdict`, `attrgetter`, generator pipelines, CSV parsing, data aggregation.
 
+**Checkpoint (end of Intermediate Track):** Do a few [Intermediate exercises](#intermediate-exercises), then continue: [Advanced Track — Professional Python](#advanced-track-professional-python).  
+**In a hurry?** Jump to [Projects](#projects-case-studies-standard-library-only) or [Recipes](#recipes-quick-reference-cheatsheets).
+
 ---
 
 ## Advanced Track — Professional Python
 
 The advanced track covers topics that separate good Python code from great Python code: object‑oriented design, type safety, concurrency, and performance.
+
+**Quick jump (Advanced Track):**
+
+| Section | Focus |
+|---|---|
+| [Object-Oriented Programming Mastery](#object-oriented-programming-mastery) | Design, MRO, dataclasses |
+| [Type Hints, Generics & Static Analysis](#type-hints-generics-static-analysis) | Type-driven design |
+| [Concurrency: Threading, Multiprocessing & Async I/O](#concurrency-threading-multiprocessing-async-i-o) | asyncio, threads, processes |
+| [Performance Optimisation & Profiling](#performance-optimisation-profiling) | profiling, hotspots |
+| [Security Best Practices for Python Applications](#security-best-practices-for-python-applications) | safe coding patterns |
+
+**Mode:** Tutorial = read sections top-to-bottom · Reference = use the quick jump table + `Ctrl+F`
+
+**Next:** [Exercises (with solutions)](#exercises-with-solutions) · [Projects & Case Studies](#projects-case-studies-standard-library-only)
 
 
 ### Object-Oriented Programming Mastery
@@ -9177,12 +9645,101 @@ if __name__ == "__main__":
 
 **What you practised:** Observer pattern, decorator-based registration, dataclasses for events, wildcard subscriptions, error-resilient dispatch.
 
+#### End-of-section exercises (with solutions)
+
+**Exercise A: ABC-based shapes**
+
+**Task:** Create an abstract base class `Shape` with `area()` and implement `Rectangle` and `Circle`.
+
+<details>
+<summary>Solution</summary>
+
+```python
+from __future__ import annotations
+
+from abc import ABC, abstractmethod
+import math
+
+
+class Shape(ABC):
+    @abstractmethod
+    def area(self) -> float:
+        raise NotImplementedError
+
+
+class Rectangle(Shape):
+    def __init__(self, width: float, height: float) -> None:
+        self.width = width
+        self.height = height
+
+    def area(self) -> float:
+        return self.width * self.height
+
+
+class Circle(Shape):
+    def __init__(self, radius: float) -> None:
+        self.radius = radius
+
+    def area(self) -> float:
+        return math.pi * self.radius * self.radius
+
+
+def demo() -> None:
+    shapes: list[Shape] = [Rectangle(3, 4), Circle(2)]
+    print([round(s.area(), 2) for s in shapes])
+
+
+if __name__ == "__main__":
+    demo()
+```
+
+</details>
+
+**Exercise B: Dataclass validation**
+
+**Task:** Create a `@dataclass(frozen=True)` `User` with `username` (non-empty) and `email` (must contain `@`). Validate in `__post_init__`.
+
+<details>
+<summary>Solution</summary>
+
+```python
+from __future__ import annotations
+
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class User:
+    username: str
+    email: str
+
+    def __post_init__(self) -> None:
+        if not self.username.strip():
+            raise ValueError("username must not be empty")
+        if "@" not in self.email:
+            raise ValueError("email must contain '@'")
+
+
+def demo() -> None:
+    print(User("alice", "alice@example.com"))
+    try:
+        User("", "broken")
+    except ValueError as e:
+        print("Validation error:", e)
+
+
+if __name__ == "__main__":
+    demo()
+```
+
+</details>
+
 ---
 
 
 ### Type Hints, Generics & Static Analysis
 
-**Goal:** Write self-documenting code with type annotations. Use `mypy` for static analysis. Understand generics, overloads, `TypeVar`, `ParamSpec`, and Python 3.12+ type syntax.
+**Goal:** Write self-documenting code with type annotations. Optionally use a static type checker (third-party tool). Understand generics, overloads, `TypeVar`, `ParamSpec`, and Python 3.12+ type syntax.
 
 ---
 
@@ -9294,7 +9851,7 @@ def first(items: list[T]) -> T:
     """Return the first item. Type is preserved."""
     return items[0]
 
-# mypy knows the return type:
+# A type checker knows the return type:
 name = first(["Alice", "Bob"])    # type: str
 number = first([1, 2, 3])         # type: int
 ```
@@ -9311,7 +9868,7 @@ def to_upper(value: T) -> T:
     return value.upper()
 
 to_upper("hello")     # OK
-# to_upper(42)         # mypy error: int is not a subclass of str
+# to_upper(42)         # type-checker error: int is not a subclass of str
 ```
 
 **Constrained TypeVar:**
@@ -9327,7 +9884,7 @@ def double(x: Number) -> Number:
 
 double(5)      # OK, returns int
 double(3.14)   # OK, returns float
-# double("hi")  # mypy error
+# double("hi")  # type-checker error
 ```
 
 ---
@@ -9408,14 +9965,14 @@ class UserProfile(TypedDict):
 def create_profile(data: UserProfile) -> str:
     return f"{data['name']} ({data['age']})"
 
-# mypy knows the exact keys and value types
+# A type checker knows the exact keys and value types
 profile: UserProfile = {
     "name": "Alice",
     "age": 30,
     "email": "alice@example.com",
 }
 
-# mypy would flag:
+# A type checker would flag:
 # bad: UserProfile = {"name": "Alice", "age": "thirty", "email": "a@b.com"}
 # TypeError: age should be int, not str
 ```
@@ -9431,7 +9988,7 @@ def set_direction(direction: Literal["north", "south", "east", "west"]) -> None:
     print(f"Moving {direction}")
 
 set_direction("north")    # OK
-# set_direction("up")     # mypy error: "up" is not a valid value
+# set_direction("up")     # type-checker error: "up" is not a valid value
 
 # Useful for configuration options
 def open_file(path: str, mode: Literal["r", "w", "a", "rb", "wb"]) -> None:
@@ -9465,7 +10022,7 @@ def parse(value):
     elif isinstance(value, int):
         return str(value)
 
-# mypy knows:
+# A type checker knows:
 # parse("{}") returns dict
 # parse(42) returns str
 ```
@@ -9499,15 +10056,15 @@ def timer(func: Callable[P, R]) -> Callable[P, R]:
 def compute(x: int, y: int) -> int:
     return x ** y
 
-# mypy knows compute still takes (int, int) -> int
+# A type checker knows compute still takes (int, int) -> int
 result = compute(2, 10)
 ```
 
 ---
 
-#### Using `mypy` for static analysis
+#### (Optional) Static type checkers
 
-**Install:** `pip install mypy`
+Static type checkers are **third-party tools** that analyze your type hints and can catch mistakes before you run your code. This guide stays standard-library-only, so you don’t need to install anything to follow along.
 
 ```python
 # example.py
@@ -9517,52 +10074,21 @@ def add(a: int, b: int) -> int:
 result = add(1, "two")   # Bug! Passing str instead of int
 ```
 
-```bash
-$ mypy example.py
-example.py:4: error: Argument 2 to "add" has incompatible type "str"; expected "int"
-Found 1 error in 1 file (checked 1 source file)
-```
-
-**mypy configuration in `pyproject.toml`:**
-
-```toml
-[tool.mypy]
-python_version = "3.12"
-strict = true                    # enable all strict checks
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = true    # require type hints on all functions
-
-[[tool.mypy.overrides]]
-module = "tests.*"
-disallow_untyped_defs = false   # relax rules for test files
-```
-
-**Common mypy flags:**
-
-| Flag | Effect |
-|------|--------|
-| `--strict` | Enable all optional checks |
-| `--ignore-missing-imports` | Don't error on missing stubs |
-| `--show-error-codes` | Show error codes (e.g., `[arg-type]`) |
-| `--disallow-any-generics` | Require generic parameters |
-| `--check-untyped-defs` | Check functions without annotations |
-
 ---
 
 #### Type narrowing
 
-`mypy` understands control flow and narrows types:
+Static type checkers understand control flow and narrow types:
 
 ```python
 def process(value: str | int | None) -> str:
     if value is None:
         return "nothing"
-    # mypy: value is str | int
+    # type checker: value is str | int
 
     if isinstance(value, str):
-        return value.upper()    # mypy: value is str
-    # mypy: value is int
+        return value.upper()    # type checker: value is str
+    # type checker: value is int
     return str(value * 2)
 ```
 
@@ -9577,7 +10103,7 @@ def is_string_list(val: list) -> TypeGuard[list[str]]:
 
 def process(items: list) -> None:
     if is_string_list(items):
-        # mypy knows items is list[str] here
+        # type checker knows items is list[str] here
         print(", ".join(items))   # safe — join expects Iterable[str]
 ```
 
@@ -9596,7 +10122,7 @@ Demonstrates:
 - Literal for valid options
 - overload for flexible API
 - Generic types
-- mypy-compatible patterns
+- type-checker compatible patterns
 """
 from typing import TypedDict, Literal, Any, overload, TypeVar, Generic
 from dataclasses import dataclass, field
@@ -9881,7 +10407,7 @@ Python has a **Global Interpreter Lock (GIL)** that allows only one thread to ex
 ```python
 import threading
 import time
-import requests
+from urllib.request import urlopen
 
 urls = [
     "https://httpbin.org/delay/1",
@@ -9893,11 +10419,12 @@ urls = [
 def fetch_url(url, results, index):
     """Fetch a URL and store the result."""
     start = time.perf_counter()
-    response = requests.get(url)
+    with urlopen(url, timeout=10) as resp:
+        status = resp.status
     elapsed = time.perf_counter() - start
     results[index] = {
         "url": url,
-        "status": response.status_code,
+        "status": status,
         "time": round(elapsed, 2),
     }
 
@@ -9927,11 +10454,11 @@ print(f"Threaded: {time.perf_counter() - start:.2f}s")
 ```python
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
+from urllib.request import urlopen
 
 def fetch(url):
-    import requests
-    response = requests.get(url)
-    return {"url": url, "status": response.status_code}
+    with urlopen(url, timeout=10) as resp:
+        return {"url": url, "status": resp.status}
 
 urls = ["https://httpbin.org/delay/1"] * 4
 
@@ -10199,49 +10726,41 @@ asyncio.run(main())
 
 ---
 
-#### Real-world async: HTTP client with `aiohttp`
+#### Real-world async: HTTP fetching (stdlib approach)
 
 ```python
 """
 async_fetcher.py — Async HTTP client demo.
 
-Requires: pip install aiohttp
-
 Demonstrates:
-- aiohttp for async HTTP requests
 - asyncio.gather for concurrent requests
 - Semaphore for rate limiting
 - Error handling in async code
 """
 import asyncio
-# import aiohttp  # pip install aiohttp
+from urllib.request import Request, urlopen
 
-async def fetch_url(session, url, semaphore):
-    """Fetch a single URL with rate limiting."""
+
+def fetch_sync(url: str, timeout: float = 10.0) -> dict:
+    """Blocking HTTP fetch using the standard library."""
+    req = Request(url, headers={"User-Agent": "python-urllib"})
+    with urlopen(req, timeout=timeout) as resp:
+        body = resp.read()
+        return {"url": url, "status": resp.status, "length": len(body)}
+
+async def fetch_url(url: str, semaphore: asyncio.Semaphore) -> dict:
+    """Fetch a single URL with rate limiting (runs blocking I/O in a thread)."""
     async with semaphore:
         try:
-            async with session.get(url, timeout=10) as response:
-                text = await response.text()
-                return {
-                    "url": url,
-                    "status": response.status,
-                    "length": len(text),
-                }
+            return await asyncio.to_thread(fetch_sync, url)
         except Exception as e:
             return {"url": url, "error": str(e)}
 
-async def fetch_many(urls, max_concurrent=5):
+async def fetch_many(urls: list[str], max_concurrent: int = 5) -> list[dict]:
     """Fetch multiple URLs concurrently."""
     semaphore = asyncio.Semaphore(max_concurrent)
-    # async with aiohttp.ClientSession() as session:
-    #     tasks = [fetch_url(session, url, semaphore) for url in urls]
-    #     return await asyncio.gather(*tasks)
-    # placeholder for demo without aiohttp:
-    results = []
-    for url in urls:
-        await asyncio.sleep(0.1)
-        results.append({"url": url, "status": 200, "length": 1000})
-    return results
+    tasks = [fetch_url(url, semaphore) for url in urls]
+    return await asyncio.gather(*tasks)
 
 async def main():
     urls = [
@@ -10264,7 +10783,7 @@ async def main():
         else:
             print(f"  {r['status']}  {r['url']} ({r['length']} bytes)")
 
-# asyncio.run(main())
+asyncio.run(main())
 ```
 
 ---
@@ -12224,6 +12743,2168 @@ demo()
 
 **What you practised:** Regex for pattern matching, `pathlib` for file scanning, `dataclass` for structured data, rule-based analysis, security awareness across multiple vulnerability categories.
 
+**Checkpoint (end of Advanced Track):** Do a few [Advanced exercises](#advanced-exercises), then build something: [Projects & Case Studies](#projects-case-studies-standard-library-only).  
+**Reference:** [Recipes](#recipes-quick-reference-cheatsheets) · [What’s New](#what-s-new-in-python-3-14)
+
+---
+
+## Exercises (with solutions)
+
+These are designed to work with **Tutorial mode** (do a few after each track), but they also work as standalone drills.
+
+### Beginner exercises
+
+#### Exercise 1: Robust integer input
+
+**Task:** Write a function `read_int(prompt, min_value=None, max_value=None)` that:
+- Re-prompts until the user enters a valid integer.
+- Optionally enforces min/max.
+
+**Solution:**
+
+```python
+from __future__ import annotations
+
+
+def read_int(prompt: str, min_value: int | None = None, max_value: int | None = None) -> int:
+    while True:
+        raw = input(prompt).strip()
+        try:
+            value = int(raw)
+        except ValueError:
+            print("Please enter a whole number.")
+            continue
+
+        if min_value is not None and value < min_value:
+            print(f"Must be >= {min_value}.")
+            continue
+        if max_value is not None and value > max_value:
+            print(f"Must be <= {max_value}.")
+            continue
+
+        return value
+
+
+def demo() -> None:
+    age = read_int("Age: ", min_value=0, max_value=130)
+    print("Age is", age)
+
+
+if __name__ == "__main__":
+    demo()
+```
+
+#### Exercise 2: Word frequency counter
+
+**Task:** Given a text string, print the top 10 most common words (case-insensitive), ignoring punctuation.
+
+**Solution:**
+
+```python
+import re
+from collections import Counter
+
+
+def top_words(text: str, n: int = 10) -> list[tuple[str, int]]:
+    words = re.findall(r"[a-zA-Z']+", text.lower())
+    return Counter(words).most_common(n)
+
+
+if __name__ == "__main__":
+    sample = "Hello, hello! This is a test. It's only a test."
+    for w, c in top_words(sample):
+        print(c, w)
+```
+
+#### Exercise 3: Simple unit parser (cm/mm/m)
+
+**Task:** Parse lengths like `"240cm"`, `"2.4m"`, `"2400mm"` into meters.
+
+**Solution:**
+
+```python
+import re
+
+
+def parse_length_m(raw: str) -> float:
+    s = raw.strip().lower().replace(",", ".")
+    m = re.fullmatch(r"\s*([0-9]+(?:\.[0-9]+)?)\s*(mm|cm|m)\s*", s)
+    if not m:
+        raise ValueError(f"Invalid length: {raw!r}")
+    v = float(m.group(1))
+    unit = m.group(2)
+    return v / 1000 if unit == "mm" else v / 100 if unit == "cm" else v
+
+
+if __name__ == "__main__":
+    for s in ["240cm", "2.4m", "2400mm"]:
+        print(s, "->", parse_length_m(s), "m")
+```
+
+---
+
+### Intermediate exercises
+
+#### Exercise 4: CLI argument parsing
+
+**Task:** Build a CLI that:
+- Accepts a file path
+- Accepts `--top N`
+- Prints the top N most common lines in the file
+
+**Solution:**
+
+```python
+import argparse
+from collections import Counter
+from pathlib import Path
+
+
+def main() -> None:
+    p = argparse.ArgumentParser(description="Top repeated lines")
+    p.add_argument("path", type=Path)
+    p.add_argument("--top", type=int, default=10)
+    args = p.parse_args()
+
+    counts: Counter[str] = Counter()
+    with args.path.open("r", encoding="utf-8", errors="replace") as f:
+        for line in f:
+            line = line.rstrip("\n")
+            if line:
+                counts[line] += 1
+
+    for line, n in counts.most_common(args.top):
+        print(f"{n:>6}  {line}")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+#### Exercise 5: SQLite CRUD (single table)
+
+**Task:** Create a `note` table (`id`, `title`, `body`) and implement `add_note` + `list_notes`.
+
+**Solution:**
+
+```python
+import sqlite3
+
+
+def connect(path: str = "notes.db") -> sqlite3.Connection:
+    conn = sqlite3.connect(path)
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS note (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, body TEXT NOT NULL)"
+    )
+    conn.commit()
+    return conn
+
+
+def add_note(conn: sqlite3.Connection, title: str, body: str) -> int:
+    cur = conn.execute("INSERT INTO note(title, body) VALUES (?, ?)", (title, body))
+    conn.commit()
+    return int(cur.lastrowid)
+
+
+def list_notes(conn: sqlite3.Connection) -> list[tuple[int, str]]:
+    rows = conn.execute("SELECT id, title FROM note ORDER BY id DESC").fetchall()
+    return [(int(r[0]), str(r[1])) for r in rows]
+
+
+if __name__ == "__main__":
+    c = connect()
+    add_note(c, "Hello", "Body")
+    print(list_notes(c))
+```
+
+#### Exercise 6: HTTP GET JSON (stdlib)
+
+**Task:** Fetch JSON from a URL and print one field.
+
+**Solution:**
+
+```python
+import json
+from urllib.request import Request, urlopen
+
+
+def get_json(url: str) -> object:
+    req = Request(url, headers={"User-Agent": "stdlib-client/1.0"})
+    with urlopen(req, timeout=10.0) as res:
+        text = res.read().decode("utf-8")
+    return json.loads(text)
+
+
+if __name__ == "__main__":
+    data = get_json("https://api.github.com/repos/python/cpython")
+    print(data["full_name"], data["stargazers_count"])
+```
+
+---
+
+### Advanced exercises
+
+#### Exercise 7: Thread pool mapping (hash files)
+
+**Task:** Hash all files under a folder using a thread pool.
+
+**Solution:**
+
+```python
+import hashlib
+from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
+
+
+def sha256_file(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as f:
+        for chunk in iter(lambda: f.read(1024 * 1024), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def hash_folder(folder: Path, workers: int = 8) -> dict[str, str]:
+    files = [p for p in folder.rglob("*") if p.is_file()]
+    with ThreadPoolExecutor(max_workers=workers) as ex:
+        digests = list(ex.map(lambda p: (str(p), sha256_file(p)), files))
+    return dict(digests)
+
+
+if __name__ == "__main__":
+    d = hash_folder(Path("."))
+    print("Hashed", len(d), "files")
+```
+
+#### Exercise 8: Minimal JSON API server
+
+**Task:** Build a tiny `http.server` endpoint that returns JSON at `/health`.
+
+**Solution:**
+
+```python
+import json
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+
+class Handler(BaseHTTPRequestHandler):
+    def do_GET(self) -> None:
+        if self.path != "/health":
+            self.send_response(404)
+            self.end_headers()
+            return
+
+        body = json.dumps({"ok": True}).encode("utf-8")
+        self.send_response(200)
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+
+if __name__ == "__main__":
+    server = ThreadingHTTPServer(("127.0.0.1", 8010), Handler)
+    print("http://127.0.0.1:8010/health")
+    server.serve_forever()
+```
+
+#### Exercise 9: GUI validation (Tkinter)
+
+**Task:** Make a Tkinter form with two numeric entries; show an error dialog if invalid.
+
+**Solution:**
+
+```python
+import tkinter as tk
+from tkinter import ttk, messagebox
+
+
+def main() -> None:
+    root = tk.Tk()
+    root.title("Validation demo")
+
+    a = tk.StringVar(value="10")
+    b = tk.StringVar(value="20")
+
+    ttk.Label(root, text="A:").grid(row=0, column=0, sticky="w")
+    ttk.Entry(root, textvariable=a).grid(row=0, column=1, sticky="ew")
+    ttk.Label(root, text="B:").grid(row=1, column=0, sticky="w")
+    ttk.Entry(root, textvariable=b).grid(row=1, column=1, sticky="ew")
+
+    out = tk.StringVar(value="")
+    ttk.Label(root, textvariable=out).grid(row=3, column=0, columnspan=2, sticky="w")
+
+    def calc() -> None:
+        try:
+            av = float(a.get().replace(",", "."))
+            bv = float(b.get().replace(",", "."))
+        except ValueError:
+            messagebox.showerror("Invalid input", "A and B must be numbers")
+            return
+        out.set(f"A + B = {av + bv}")
+
+    ttk.Button(root, text="Calculate", command=calc).grid(row=2, column=0, columnspan=2, sticky="ew")
+    root.columnconfigure(1, weight=1)
+    root.mainloop()
+
+
+if __name__ == "__main__":
+    main()
+```
+
+**Next:** pick one project in the gallery and build it end-to-end.
+
+---
+
+## Projects & Case Studies (Standard Library Only)
+
+This section is a **project gallery**: lots of real, end-to-end examples from tiny beginner scripts to large multi-file applications.
+
+**Constraints for this guide:**
+- **Standard library only** (no third‑party packages). If you want a library-specific version, put it in your separate library guide.
+- **Full solutions included** so you can compare your attempt vs a working reference.
+
+**How to use these projects (best learning loop):**
+1. Read the spec (what to build).
+2. Implement your own version.
+3. Compare with the solution.
+4. Add 1–2 “stretch goals”.
+
+### Project index (pick by level)
+
+| Level | Project | Domain | Key modules |
+| --- | --- | --- | --- |
+| Beginner (micro) | [Input cleaner + calculator](#micro-project-1-input-cleaner-calculator) | CLI | `math`, `re` |
+| Beginner (micro) | [Guess-the-number (with hints)](#micro-project-2-guess-the-number-with-warmer-colder) | Game/CLI | `random` |
+| Beginner (micro) | [CSV → JSON converter](#micro-project-3-csv-json-converter) | Data | `csv`, `json`, `pathlib` |
+| Beginner (small) | [File organizer (by extension)](#beginner-project-1-file-organizer-by-extension) | Automation | `pathlib`, `shutil` |
+| Beginner (small) | [Log analyzer (top errors)](#beginner-project-2-log-analyzer-top-errors) | Ops | `re`, `collections`, `argparse` |
+| Beginner (small) | [Flashcards in terminal](#beginner-project-3-flashcards-in-the-terminal-json-backed) | Study | `json`, `random`, `time` |
+| Intermediate | [SQLite “todo + tags” CLI](#intermediate-project-1-sqlite-todo-app-with-tags-cli) | App/DB | `sqlite3`, `argparse` |
+| Intermediate | [HTTP API client + caching](#intermediate-project-2-http-api-client-with-caching-urllib-sqlite) | Networking | `urllib.request`, `json`, `sqlite3` |
+| Intermediate | [Simple JSON REST server](#intermediate-project-3-minimal-json-rest-server-http-server) | Web | `http.server`, `json`, `sqlite3` |
+| Intermediate | [Parallel file hasher](#intermediate-project-4-parallel-file-hasher-concurrent-futures) | Performance | `hashlib`, `concurrent.futures`, `pathlib` |
+| Advanced | [Tkinter Heat Loss Calculator (desktop)](#advanced-project-1-capstone-tkinter-heat-loss-calculator-desktop) | GUI | `tkinter`, `dataclasses`, `sqlite3`, `logging` |
+| Advanced | [Async chat server + client](#advanced-project-2-async-chat-server-client-asyncio) | Networking | `asyncio` |
+| Advanced | [Plugin-based CLI tool skeleton](#advanced-project-3-plugin-based-cli-tool-skeleton) | Architecture | `argparse`, `importlib`, `tomllib`, `logging` |
+
+---
+
+### Micro-project 1: Input cleaner + calculator
+
+**Goal:** Build a small CLI program that safely reads numbers, supports units, and computes common building-ish values.
+
+**Spec:**
+- Accept user input like `"2.4"`, `"2,4"`, `"2.4m"`, `"240cm"`.
+- Convert to **meters**.
+- Compute rectangle area and heat loss (conduction): $Q = U \times A \times \Delta T$.
+
+**Solution (single file):**
+
+```python
+from __future__ import annotations
+
+import re
+
+
+def parse_length_to_meters(raw: str) -> float:
+    s = raw.strip().lower().replace(',', '.')
+    m = re.fullmatch(r"\s*([0-9]+(?:\.[0-9]+)?)\s*(mm|cm|m)?\s*", s)
+    if not m:
+        raise ValueError(f"Invalid length: {raw!r}")
+
+    value = float(m.group(1))
+    unit = m.group(2) or 'm'
+
+    if unit == 'mm':
+        return value / 1000
+    if unit == 'cm':
+        return value / 100
+    if unit == 'm':
+        return value
+    raise ValueError(f"Unsupported unit: {unit}")
+
+
+def main() -> None:
+    print("Rectangle area + heat loss calculator (simple)")
+
+    width_m = parse_length_to_meters(input("Width (e.g. 2.4m / 240cm): "))
+    height_m = parse_length_to_meters(input("Height (e.g. 2.1m / 210cm): "))
+    u_value = float(input("U-value (W/m²K): ").strip().replace(',', '.'))
+    delta_t = float(input("ΔT (K or °C difference): ").strip().replace(',', '.'))
+
+    area = width_m * height_m
+    q_watts = u_value * area * delta_t
+
+    print(f"Area: {area:.3f} m²")
+    print(f"Heat loss (conduction): {q_watts:.1f} W")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+**Stretch goals:**
+- Add `kW` output and rounding rules.
+- Add input retry loops instead of crashing.
+
+---
+
+### Micro-project 2: Guess-the-number (with “warmer/colder”)
+
+**Goal:** Practice loops, conditionals, and state.
+
+**Spec:**
+- Pick a random number from 1–100.
+- Each guess prints: `higher` / `lower`.
+- After the 2nd guess, also print `warmer` / `colder` compared to previous guess.
+
+**Solution:**
+
+```python
+import random
+
+
+def main() -> None:
+    secret = random.randint(1, 100)
+    last_dist = None
+    guesses = 0
+
+    print("Guess the number (1-100)")
+
+    while True:
+        raw = input("Your guess: ").strip()
+        if not raw.isdigit():
+            print("Enter a whole number.")
+            continue
+
+        guess = int(raw)
+        guesses += 1
+
+        if guess == secret:
+            print(f"Correct! You took {guesses} guesses.")
+            return
+
+        hint = "higher" if guess < secret else "lower"
+        dist = abs(secret - guess)
+
+        extra = ""
+        if last_dist is not None:
+            extra = " (warmer)" if dist < last_dist else " (colder)"
+
+        print(hint + extra)
+        last_dist = dist
+
+
+if __name__ == "__main__":
+    main()
+```
+
+---
+
+### Micro-project 3: CSV → JSON converter
+
+**Goal:** Practice file I/O, data formats, and CLI arguments.
+
+**Spec:**
+- Read a CSV with headers.
+- Output JSON list of objects.
+- Support `--delimiter` and `--out`.
+
+**Solution:**
+
+```python
+import argparse
+import csv
+import json
+from pathlib import Path
+
+
+def main() -> None:
+    p = argparse.ArgumentParser(description="Convert CSV to JSON")
+    p.add_argument("csv_path", type=Path)
+    p.add_argument("--delimiter", default=",")
+    p.add_argument("--out", type=Path, default=None)
+    args = p.parse_args()
+
+    with args.csv_path.open("r", encoding="utf-8", newline="") as f:
+        reader = csv.DictReader(f, delimiter=args.delimiter)
+        rows = list(reader)
+
+    out_path = args.out or args.csv_path.with_suffix(".json")
+    out_path.write_text(json.dumps(rows, indent=2), encoding="utf-8")
+    print(f"Wrote {len(rows)} rows to {out_path}")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+---
+
+### Beginner project 1: File organizer (by extension)
+
+**Goal:** Automate tidying a downloads folder.
+
+**Spec:**
+- Given a folder, move files into subfolders like `pdf/`, `images/`, `code/`, `other/`.
+- Never overwrite: if a name exists, append `-1`, `-2`, etc.
+- Provide a `--dry-run` mode.
+
+**Solution:**
+
+```python
+import argparse
+from pathlib import Path
+import shutil
+
+
+CATEGORIES = {
+    "images": {".png", ".jpg", ".jpeg", ".gif", ".webp"},
+    "pdf": {".pdf"},
+    "code": {".py", ".js", ".ts", ".html", ".css", ".json"},
+    "docs": {".doc", ".docx", ".txt", ".md"},
+}
+
+
+def category_for(path: Path) -> str:
+    ext = path.suffix.lower()
+    for cat, exts in CATEGORIES.items():
+        if ext in exts:
+            return cat
+    return "other"
+
+
+def unique_dest(dest: Path) -> Path:
+    if not dest.exists():
+        return dest
+    stem = dest.stem
+    suffix = dest.suffix
+    parent = dest.parent
+    i = 1
+    while True:
+        candidate = parent / f"{stem}-{i}{suffix}"
+        if not candidate.exists():
+            return candidate
+        i += 1
+
+
+def main() -> None:
+    p = argparse.ArgumentParser(description="Organize files by extension")
+    p.add_argument("folder", type=Path)
+    p.add_argument("--dry-run", action="store_true")
+    args = p.parse_args()
+
+    folder: Path = args.folder
+    if not folder.exists() or not folder.is_dir():
+        raise SystemExit("Folder does not exist or is not a directory")
+
+    moved = 0
+    for item in folder.iterdir():
+        if item.is_dir():
+            continue
+
+        cat = category_for(item)
+        target_dir = folder / cat
+        target_dir.mkdir(exist_ok=True)
+        dest = unique_dest(target_dir / item.name)
+
+        if args.dry_run:
+            print(f"DRY: {item.name} -> {dest.relative_to(folder)}")
+        else:
+            shutil.move(str(item), str(dest))
+        moved += 1
+
+    print(f"Processed {moved} files")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+---
+
+### Beginner project 2: Log analyzer (top errors)
+
+**Goal:** Turn messy logs into a useful summary.
+
+**Spec:**
+- Read a log file.
+- Extract lines that contain `ERROR`.
+- Count unique error messages (group by message text).
+- Print the top N.
+
+**Solution:**
+
+```python
+import argparse
+import re
+from collections import Counter
+from pathlib import Path
+
+
+def main() -> None:
+    p = argparse.ArgumentParser(description="Summarize errors from a log")
+    p.add_argument("log_path", type=Path)
+    p.add_argument("--top", type=int, default=10)
+    args = p.parse_args()
+
+    pattern = re.compile(r"\bERROR\b\s*[:-]?\s*(.*)")
+    counts: Counter[str] = Counter()
+
+    with args.log_path.open("r", encoding="utf-8", errors="replace") as f:
+        for line in f:
+            m = pattern.search(line)
+            if not m:
+                continue
+            msg = m.group(1).strip() or "(no message)"
+            counts[msg] += 1
+
+    for msg, n in counts.most_common(args.top):
+        print(f"{n:>6}  {msg}")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+---
+
+### Beginner project 3: Flashcards in the terminal (JSON-backed)
+
+**Goal:** A simple study app you can keep extending.
+
+**Spec:**
+- Store cards in a JSON file: `[{"q": "...", "a": "..."}, ...]`.
+- Randomly quiz.
+- Show answer after enter.
+
+**Solution:**
+
+```python
+import json
+import random
+from pathlib import Path
+
+
+def load_cards(path: Path) -> list[dict[str, str]]:
+    if not path.exists():
+        return []
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def main() -> None:
+    path = Path("cards.json")
+    cards = load_cards(path)
+    if not cards:
+        print("No cards found. Create cards.json like: [{\"q\":\"2+2?\",\"a\":\"4\"}]")
+        return
+
+    random.shuffle(cards)
+    score = 0
+
+    for card in cards:
+        print("\nQ:", card["q"])
+        input("Press Enter to show answer… ")
+        print("A:", card["a"])
+        ok = input("Did you get it right? (y/n): ").strip().lower().startswith("y")
+        score += 1 if ok else 0
+
+    print(f"\nScore: {score}/{len(cards)}")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+---
+
+### Intermediate project 1: SQLite todo app with tags (CLI)
+
+**Goal:** A “real” app with persistence and a sane CLI.
+
+**Spec:**
+- Commands: `add`, `list`, `done`, `delete`, `tag`.
+- Store in SQLite (`todo.db`).
+- Use foreign keys for tags.
+
+**Solution (single file, but structured):**
+
+```python
+from __future__ import annotations
+
+import argparse
+import sqlite3
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class Todo:
+    id: int
+    title: str
+    done: bool
+
+
+def connect(db_path: str = "todo.db") -> sqlite3.Connection:
+    conn = sqlite3.connect(db_path)
+    conn.execute("PRAGMA foreign_keys = ON")
+    return conn
+
+
+def init_db(conn: sqlite3.Connection) -> None:
+    conn.executescript(
+        """
+        CREATE TABLE IF NOT EXISTS todo (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          title TEXT NOT NULL,
+          done INTEGER NOT NULL DEFAULT 0
+        );
+
+        CREATE TABLE IF NOT EXISTS tag (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT NOT NULL UNIQUE
+        );
+
+        CREATE TABLE IF NOT EXISTS todo_tag (
+          todo_id INTEGER NOT NULL,
+          tag_id INTEGER NOT NULL,
+          PRIMARY KEY (todo_id, tag_id),
+          FOREIGN KEY (todo_id) REFERENCES todo(id) ON DELETE CASCADE,
+          FOREIGN KEY (tag_id) REFERENCES tag(id) ON DELETE CASCADE
+        );
+        """
+    )
+    conn.commit()
+
+
+def add_todo(conn: sqlite3.Connection, title: str) -> None:
+    conn.execute("INSERT INTO todo(title) VALUES (?)", (title,))
+    conn.commit()
+
+
+def list_todos(conn: sqlite3.Connection, show_done: bool) -> None:
+    q = "SELECT id, title, done FROM todo"
+    if not show_done:
+        q += " WHERE done = 0"
+    q += " ORDER BY done, id"
+
+    for row in conn.execute(q):
+        t = Todo(id=row[0], title=row[1], done=bool(row[2]))
+        mark = "✓" if t.done else " "
+        print(f"[{mark}] {t.id:>4}  {t.title}")
+
+
+def mark_done(conn: sqlite3.Connection, todo_id: int) -> None:
+    conn.execute("UPDATE todo SET done = 1 WHERE id = ?", (todo_id,))
+    conn.commit()
+
+
+def delete_todo(conn: sqlite3.Connection, todo_id: int) -> None:
+    conn.execute("DELETE FROM todo WHERE id = ?", (todo_id,))
+    conn.commit()
+
+
+def add_tag(conn: sqlite3.Connection, todo_id: int, name: str) -> None:
+    conn.execute("INSERT OR IGNORE INTO tag(name) VALUES (?)", (name,))
+    tag_id = conn.execute("SELECT id FROM tag WHERE name = ?", (name,)).fetchone()[0]
+    conn.execute("INSERT OR IGNORE INTO todo_tag(todo_id, tag_id) VALUES (?, ?)", (todo_id, tag_id))
+    conn.commit()
+
+
+def build_parser() -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(prog="todo", description="SQLite todo app")
+    sub = p.add_subparsers(dest="cmd", required=True)
+
+    a = sub.add_parser("add")
+    a.add_argument("title")
+
+    l = sub.add_parser("list")
+    l.add_argument("--all", action="store_true", help="Include done tasks")
+
+    d = sub.add_parser("done")
+    d.add_argument("id", type=int)
+
+    r = sub.add_parser("delete")
+    r.add_argument("id", type=int)
+
+    t = sub.add_parser("tag")
+    t.add_argument("id", type=int)
+    t.add_argument("name")
+
+    return p
+
+
+def main() -> None:
+    args = build_parser().parse_args()
+    conn = connect()
+    init_db(conn)
+
+    match args.cmd:
+        case "add":
+            add_todo(conn, args.title)
+        case "list":
+            list_todos(conn, show_done=args.all)
+        case "done":
+            mark_done(conn, args.id)
+        case "delete":
+            delete_todo(conn, args.id)
+        case "tag":
+            add_tag(conn, args.id, args.name)
+
+
+if __name__ == "__main__":
+    main()
+```
+
+**Stretch goals:**
+- Add `search` and `--tag` filtering.
+- Add tests around DB functions using a temp DB file.
+
+---
+
+### Intermediate project 2: HTTP API client with caching (urllib + sqlite)
+
+**Goal:** Call an HTTP JSON API using only the standard library, and cache results.
+
+**Spec:**
+- `get_json(url)` fetches JSON.
+- Store responses in SQLite keyed by URL for N minutes.
+
+**Solution:**
+
+```python
+from __future__ import annotations
+
+import json
+import sqlite3
+import time
+from urllib.request import Request, urlopen
+
+
+def init_db(conn: sqlite3.Connection) -> None:
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS cache (
+          url TEXT PRIMARY KEY,
+          fetched_at INTEGER NOT NULL,
+          body TEXT NOT NULL
+        )
+        """
+    )
+    conn.commit()
+
+
+def fetch_json(url: str, timeout: float = 10.0) -> object:
+    req = Request(url, headers={"User-Agent": "stdlib-client/1.0"})
+    with urlopen(req, timeout=timeout) as res:
+        data = res.read().decode("utf-8")
+    return json.loads(data)
+
+
+def get_json_cached(conn: sqlite3.Connection, url: str, ttl_seconds: int = 300) -> object:
+    now = int(time.time())
+    row = conn.execute("SELECT fetched_at, body FROM cache WHERE url = ?", (url,)).fetchone()
+    if row:
+        fetched_at, body = row
+        if now - fetched_at <= ttl_seconds:
+            return json.loads(body)
+
+    obj = fetch_json(url)
+    conn.execute(
+        "INSERT INTO cache(url, fetched_at, body) VALUES (?,?,?)\n"
+        "ON CONFLICT(url) DO UPDATE SET fetched_at=excluded.fetched_at, body=excluded.body",
+        (url, now, json.dumps(obj)),
+    )
+    conn.commit()
+    return obj
+
+
+def demo() -> None:
+    # Public JSON endpoint (no API key required)
+    url = "https://api.github.com/repos/python/cpython"
+    conn = sqlite3.connect("http_cache.db")
+    init_db(conn)
+    data = get_json_cached(conn, url, ttl_seconds=60)
+    print("Repo:", data["full_name"], "Stars:", data["stargazers_count"])
+
+
+if __name__ == "__main__":
+    demo()
+```
+
+---
+
+### Intermediate project 3: Minimal JSON REST server (http.server)
+
+**Goal:** Learn how HTTP handlers work by building a tiny API.
+
+**Spec:**
+- `GET /items` returns JSON list.
+- `POST /items` creates an item (JSON body).
+- Store in SQLite.
+
+**Solution (compact):**
+
+```python
+from __future__ import annotations
+
+import json
+import sqlite3
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+
+def init_db(conn: sqlite3.Connection) -> None:
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS item (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL)"
+    )
+    conn.commit()
+
+
+class Handler(BaseHTTPRequestHandler):
+    def _json(self, status: int, payload: object) -> None:
+        body = json.dumps(payload).encode("utf-8")
+        self.send_response(status)
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+    def do_GET(self) -> None:
+        if self.path != "/items":
+            self._json(404, {"error": "not found"})
+            return
+
+        conn = sqlite3.connect("items.db")
+        init_db(conn)
+        rows = conn.execute("SELECT id, name FROM item ORDER BY id").fetchall()
+        self._json(200, [{"id": r[0], "name": r[1]} for r in rows])
+
+    def do_POST(self) -> None:
+        if self.path != "/items":
+            self._json(404, {"error": "not found"})
+            return
+
+        length = int(self.headers.get("Content-Length", "0"))
+        raw = self.rfile.read(length).decode("utf-8")
+        data = json.loads(raw) if raw else {}
+        name = (data.get("name") or "").strip()
+        if not name:
+            self._json(400, {"error": "name required"})
+            return
+
+        conn = sqlite3.connect("items.db")
+        init_db(conn)
+        cur = conn.execute("INSERT INTO item(name) VALUES (?)", (name,))
+        conn.commit()
+        self._json(201, {"id": cur.lastrowid, "name": name})
+
+
+def main() -> None:
+    server = ThreadingHTTPServer(("127.0.0.1", 8008), Handler)
+    print("Serving on http://127.0.0.1:8008")
+    server.serve_forever()
+
+
+if __name__ == "__main__":
+    main()
+```
+
+Try it:
+
+```bash
+curl http://127.0.0.1:8008/items
+curl -X POST http://127.0.0.1:8008/items -H "Content-Type: application/json" -d '{"name":"milk"}'
+```
+
+---
+
+### Intermediate project 4: Parallel file hasher (concurrent.futures)
+
+**Goal:** Learn safe parallelism for I/O heavy tasks.
+
+**Spec:**
+- Recursively hash files in a folder using SHA-256.
+- Use a thread pool.
+- Output a CSV of `path, sha256`.
+
+**Solution:**
+
+```python
+from __future__ import annotations
+
+import argparse
+import csv
+import hashlib
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from pathlib import Path
+
+
+def sha256_file(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as f:
+        for chunk in iter(lambda: f.read(1024 * 1024), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def main() -> None:
+    p = argparse.ArgumentParser(description="Hash files in parallel")
+    p.add_argument("folder", type=Path)
+    p.add_argument("--out", type=Path, default=Path("hashes.csv"))
+    p.add_argument("--workers", type=int, default=8)
+    args = p.parse_args()
+
+    files = [p for p in args.folder.rglob("*") if p.is_file()]
+    with args.out.open("w", encoding="utf-8", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["path", "sha256"])
+
+        with ThreadPoolExecutor(max_workers=args.workers) as ex:
+            futs = {ex.submit(sha256_file, path): path for path in files}
+            for fut in as_completed(futs):
+                path = futs[fut]
+                try:
+                    digest = fut.result()
+                except Exception as e:
+                    digest = f"ERROR: {e}"
+                w.writerow([str(path), digest])
+
+    print(f"Wrote {args.out} ({len(files)} files)")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+---
+
+### Advanced project 1 (capstone): Tkinter Heat Loss Calculator (desktop)
+
+This is directly aligned with what you’re building.
+
+**Important:** This is a learning project, not professional engineering software.
+
+#### What it does
+
+- Lets you create a “project” with rooms.
+- Each room has surfaces (wall/window/roof/floor) with area and U-value.
+- Computes conduction heat loss: $Q = \sum (U \times A \times \Delta T)$.
+- Optional ventilation loss (simple): $Q_v = 0.33 \times ACH \times V \times \Delta T$.
+- Saves everything into SQLite.
+
+#### Suggested structure (multi-file)
+
+```
+heat_loss_app/
+  app.py
+  model.py
+  db.py
+  ui.py
+  calc.py
+  tests/
+    test_calc.py
+```
+
+#### Core formulas (calc.py)
+
+```python
+from __future__ import annotations
+
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class Surface:
+    name: str
+    area_m2: float
+    u_value_w_m2k: float
+
+
+def conduction_heat_loss_w(surfaces: list[Surface], delta_t_k: float) -> float:
+    return sum(s.u_value_w_m2k * s.area_m2 * delta_t_k for s in surfaces)
+
+
+def ventilation_heat_loss_w(volume_m3: float, ach: float, delta_t_k: float) -> float:
+    # Very common rule-of-thumb constant.
+    # Q(W) ≈ 0.33 * ACH * V(m³) * ΔT(K)
+    return 0.33 * ach * volume_m3 * delta_t_k
+```
+
+#### Minimal UI (single-window example)
+
+```python
+from __future__ import annotations
+
+import tkinter as tk
+from tkinter import ttk, messagebox
+
+from calc import Surface, conduction_heat_loss_w, ventilation_heat_loss_w
+
+
+class App(ttk.Frame):
+    def __init__(self, master: tk.Tk) -> None:
+        super().__init__(master)
+        self.grid(sticky="nsew")
+
+        master.title("Heat Loss Calculator (Learning Project)")
+        master.geometry("720x420")
+        master.columnconfigure(0, weight=1)
+        master.rowconfigure(0, weight=1)
+
+        self.delta_t = tk.StringVar(value="20")
+        self.volume = tk.StringVar(value="50")
+        self.ach = tk.StringVar(value="0.5")
+
+        header = ttk.Label(self, text="Room Heat Loss", font=("Segoe UI", 14, "bold"))
+        header.grid(row=0, column=0, columnspan=4, sticky="w", pady=(0, 10))
+
+        ttk.Label(self, text="ΔT (K):").grid(row=1, column=0, sticky="w")
+        ttk.Entry(self, textvariable=self.delta_t, width=10).grid(row=1, column=1, sticky="w")
+
+        ttk.Label(self, text="Volume (m³):").grid(row=1, column=2, sticky="w")
+        ttk.Entry(self, textvariable=self.volume, width=10).grid(row=1, column=3, sticky="w")
+
+        ttk.Label(self, text="ACH:").grid(row=2, column=2, sticky="w")
+        ttk.Entry(self, textvariable=self.ach, width=10).grid(row=2, column=3, sticky="w")
+
+        # A tiny “surface list” (for learning)
+        self.surfaces: list[Surface] = [
+            Surface("Wall", area_m2=10.0, u_value_w_m2k=0.3),
+            Surface("Window", area_m2=2.0, u_value_w_m2k=1.4),
+        ]
+
+        self.out = tk.StringVar(value="")
+        ttk.Button(self, text="Calculate", command=self.calculate).grid(row=3, column=0, sticky="w", pady=12)
+        ttk.Label(self, textvariable=self.out).grid(row=4, column=0, columnspan=4, sticky="w")
+
+        for c in range(4):
+            self.columnconfigure(c, weight=1)
+
+    def calculate(self) -> None:
+        try:
+            dt = float(self.delta_t.get())
+            vol = float(self.volume.get())
+            ach = float(self.ach.get())
+        except ValueError:
+            messagebox.showerror("Invalid input", "ΔT, Volume, and ACH must be numbers")
+            return
+
+        q_cond = conduction_heat_loss_w(self.surfaces, dt)
+        q_vent = ventilation_heat_loss_w(vol, ach, dt)
+        q_total = q_cond + q_vent
+        self.out.set(f"Conduction: {q_cond:.1f} W   Ventilation: {q_vent:.1f} W   Total: {q_total:.1f} W")
+
+
+def main() -> None:
+    root = tk.Tk()
+    root.option_add("*tearOff", False)
+    ttk.Style().theme_use("clam")
+    App(root)
+    root.mainloop()
+
+
+if __name__ == "__main__":
+    main()
+```
+
+#### Tests (unittest)
+
+```python
+import unittest
+
+from calc import Surface, conduction_heat_loss_w, ventilation_heat_loss_w
+
+
+class TestCalc(unittest.TestCase):
+    def test_conduction(self) -> None:
+        surfaces = [Surface("Wall", 10.0, 0.3)]
+        self.assertAlmostEqual(conduction_heat_loss_w(surfaces, 20), 60.0)
+
+    def test_ventilation(self) -> None:
+        self.assertAlmostEqual(ventilation_heat_loss_w(50, 0.5, 20), 165.0)
+
+
+if __name__ == "__main__":
+    unittest.main()
+```
+
+**Stretch goals (this is where it becomes “real app”):**
+- Add a `Treeview` table to add/edit/remove surfaces.
+- Add full project/room persistence in `sqlite3`.
+- Add exporting a report to CSV/JSON.
+- Add input validation rules (no negative areas, U-values in a sensible range, etc.).
+
+#### Full runnable reference implementation (multi-file)
+
+This is a complete stdlib-only implementation with:
+- Project → rooms → surfaces
+- `Treeview` CRUD UI
+- SQLite persistence
+- Export to JSON and CSV
+- `unittest` for the calc module
+
+It’s also available in this repo at:
+
+```text
+examples/heat_loss_app/
+```
+
+Run it (from the repo root):
+
+```powershell
+.venv\Scripts\python.exe -m examples.heat_loss_app.app
+```
+
+Run tests:
+
+```powershell
+.venv\Scripts\python.exe -m unittest examples.heat_loss_app.tests.test_calc
+```
+
+**File: `examples/heat_loss_app/app.py`**
+
+```python
+from __future__ import annotations
+
+from pathlib import Path
+
+from .ui import run
+
+
+def main() -> None:
+    db_path = Path(__file__).with_name("heat_loss.db")
+    run(db_path)
+
+
+if __name__ == "__main__":
+    main()
+```
+
+**File: `examples/heat_loss_app/calc.py`**
+
+```python
+from __future__ import annotations
+
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class Surface:
+    name: str
+    kind: str  # e.g. wall/window/roof/floor
+    area_m2: float
+    u_value_w_m2k: float
+
+
+@dataclass(frozen=True)
+class Room:
+    name: str
+    volume_m3: float
+    ach: float
+
+
+def conduction_heat_loss_w(surfaces: list[Surface], delta_t_k: float) -> float:
+    return sum(s.u_value_w_m2k * s.area_m2 * delta_t_k for s in surfaces)
+
+
+def ventilation_heat_loss_w(volume_m3: float, ach: float, delta_t_k: float) -> float:
+    # Rule-of-thumb constant:
+    # Q(W) ≈ 0.33 * ACH * V(m³) * ΔT(K)
+    return 0.33 * ach * volume_m3 * delta_t_k
+
+
+def room_heat_loss_w(room: Room, surfaces: list[Surface], delta_t_k: float) -> tuple[float, float, float]:
+    q_cond = conduction_heat_loss_w(surfaces, delta_t_k)
+    q_vent = ventilation_heat_loss_w(room.volume_m3, room.ach, delta_t_k)
+    return q_cond, q_vent, q_cond + q_vent
+```
+
+**File: `examples/heat_loss_app/model.py`**
+
+```python
+from __future__ import annotations
+
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class Project:
+    id: int
+    name: str
+    delta_t_k: float
+
+
+@dataclass(frozen=True)
+class Room:
+    id: int
+    project_id: int
+    name: str
+    volume_m3: float
+    ach: float
+
+
+@dataclass(frozen=True)
+class Surface:
+    id: int
+    room_id: int
+    kind: str
+    name: str
+    area_m2: float
+    u_value_w_m2k: float
+```
+
+**File: `examples/heat_loss_app/db.py`**
+
+```python
+from __future__ import annotations
+
+import sqlite3
+from pathlib import Path
+
+from .model import Project, Room, Surface
+
+
+SCHEMA = """
+PRAGMA foreign_keys = ON;
+
+CREATE TABLE IF NOT EXISTS project (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL UNIQUE,
+  delta_t_k REAL NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS room (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  project_id INTEGER NOT NULL,
+  name TEXT NOT NULL,
+  volume_m3 REAL NOT NULL,
+  ach REAL NOT NULL,
+  FOREIGN KEY (project_id) REFERENCES project(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS surface (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  room_id INTEGER NOT NULL,
+  kind TEXT NOT NULL,
+  name TEXT NOT NULL,
+  area_m2 REAL NOT NULL,
+  u_value_w_m2k REAL NOT NULL,
+  FOREIGN KEY (room_id) REFERENCES room(id) ON DELETE CASCADE
+);
+"""
+
+
+def connect(db_path: Path) -> sqlite3.Connection:
+    conn = sqlite3.connect(db_path)
+    conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA foreign_keys = ON")
+    conn.executescript(SCHEMA)
+    conn.commit()
+    return conn
+
+
+def list_projects(conn: sqlite3.Connection) -> list[Project]:
+    rows = conn.execute("SELECT id, name, delta_t_k FROM project ORDER BY name").fetchall()
+    return [Project(id=r["id"], name=r["name"], delta_t_k=float(r["delta_t_k"])) for r in rows]
+
+
+def create_project(conn: sqlite3.Connection, name: str, delta_t_k: float) -> int:
+    cur = conn.execute("INSERT INTO project(name, delta_t_k) VALUES (?, ?)", (name, delta_t_k))
+    conn.commit()
+    return int(cur.lastrowid)
+
+
+def update_project_delta_t(conn: sqlite3.Connection, project_id: int, delta_t_k: float) -> None:
+    conn.execute("UPDATE project SET delta_t_k = ? WHERE id = ?", (delta_t_k, project_id))
+    conn.commit()
+
+
+def delete_project(conn: sqlite3.Connection, project_id: int) -> None:
+    conn.execute("DELETE FROM project WHERE id = ?", (project_id,))
+    conn.commit()
+
+
+def list_rooms(conn: sqlite3.Connection, project_id: int) -> list[Room]:
+    rows = conn.execute(
+        "SELECT id, project_id, name, volume_m3, ach FROM room WHERE project_id = ? ORDER BY name",
+        (project_id,),
+    ).fetchall()
+    return [
+        Room(
+            id=r["id"],
+            project_id=r["project_id"],
+            name=r["name"],
+            volume_m3=float(r["volume_m3"]),
+            ach=float(r["ach"]),
+        )
+        for r in rows
+    ]
+
+
+def create_room(conn: sqlite3.Connection, project_id: int, name: str, volume_m3: float, ach: float) -> int:
+    cur = conn.execute(
+        "INSERT INTO room(project_id, name, volume_m3, ach) VALUES (?,?,?,?)",
+        (project_id, name, volume_m3, ach),
+    )
+    conn.commit()
+    return int(cur.lastrowid)
+
+
+def update_room(conn: sqlite3.Connection, room_id: int, name: str, volume_m3: float, ach: float) -> None:
+    conn.execute(
+        "UPDATE room SET name = ?, volume_m3 = ?, ach = ? WHERE id = ?",
+        (name, volume_m3, ach, room_id),
+    )
+    conn.commit()
+
+
+def delete_room(conn: sqlite3.Connection, room_id: int) -> None:
+    conn.execute("DELETE FROM room WHERE id = ?", (room_id,))
+    conn.commit()
+
+
+def list_surfaces(conn: sqlite3.Connection, room_id: int) -> list[Surface]:
+    rows = conn.execute(
+        "SELECT id, room_id, kind, name, area_m2, u_value_w_m2k FROM surface WHERE room_id = ? ORDER BY id",
+        (room_id,),
+    ).fetchall()
+    return [
+        Surface(
+            id=r["id"],
+            room_id=r["room_id"],
+            kind=r["kind"],
+            name=r["name"],
+            area_m2=float(r["area_m2"]),
+            u_value_w_m2k=float(r["u_value_w_m2k"]),
+        )
+        for r in rows
+    ]
+
+
+def create_surface(
+    conn: sqlite3.Connection,
+    room_id: int,
+    kind: str,
+    name: str,
+    area_m2: float,
+    u_value_w_m2k: float,
+) -> int:
+    cur = conn.execute(
+        "INSERT INTO surface(room_id, kind, name, area_m2, u_value_w_m2k) VALUES (?,?,?,?,?)",
+        (room_id, kind, name, area_m2, u_value_w_m2k),
+    )
+    conn.commit()
+    return int(cur.lastrowid)
+
+
+def update_surface(conn: sqlite3.Connection, surface_id: int, kind: str, name: str, area_m2: float, u_value_w_m2k: float) -> None:
+    conn.execute(
+        "UPDATE surface SET kind = ?, name = ?, area_m2 = ?, u_value_w_m2k = ? WHERE id = ?",
+        (kind, name, area_m2, u_value_w_m2k, surface_id),
+    )
+    conn.commit()
+
+
+def delete_surface(conn: sqlite3.Connection, surface_id: int) -> None:
+    conn.execute("DELETE FROM surface WHERE id = ?", (surface_id,))
+    conn.commit()
+```
+
+**File: `examples/heat_loss_app/ui.py`**
+
+```python
+from __future__ import annotations
+
+import csv
+import json
+import logging
+from dataclasses import asdict
+from pathlib import Path
+import tkinter as tk
+from tkinter import filedialog, messagebox, simpledialog
+from tkinter import ttk
+
+from . import db
+from .calc import Room as CalcRoom
+from .calc import Surface as CalcSurface
+from .calc import room_heat_loss_w
+from .model import Project, Room, Surface
+
+
+KINDS = ["wall", "window", "roof", "floor", "door", "other"]
+
+
+def _float_or_error(raw: str, label: str) -> float:
+    try:
+        return float(raw.strip().replace(",", "."))
+    except Exception:
+        raise ValueError(f"{label} must be a number")
+
+
+def _validate_positive(value: float, label: str) -> None:
+    if value <= 0:
+        raise ValueError(f"{label} must be > 0")
+
+
+class HeatLossApp(ttk.Frame):
+    def __init__(self, master: tk.Tk, db_path: Path) -> None:
+        super().__init__(master)
+        self.db_path = db_path
+        self.conn = db.connect(db_path)
+
+        self.projects: list[Project] = []
+        self.rooms: list[Room] = []
+        self.surfaces: list[Surface] = []
+
+        master.title("Heat Loss Calculator (Stdlib Example)")
+        master.geometry("980x560")
+        master.columnconfigure(0, weight=1)
+        master.rowconfigure(0, weight=1)
+
+        self.grid(sticky="nsew")
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure(1, weight=1)
+
+        self._build_toolbar()
+        self._build_body()
+        self._refresh_all()
+
+    def _build_toolbar(self) -> None:
+        bar = ttk.Frame(self)
+        bar.grid(row=0, column=0, sticky="ew", pady=(0, 8))
+        bar.columnconfigure(9, weight=1)
+
+        ttk.Label(bar, text="Project:").grid(row=0, column=0, sticky="w")
+        self.project_var = tk.StringVar(value="")
+        self.project_combo = ttk.Combobox(bar, textvariable=self.project_var, state="readonly", width=28)
+        self.project_combo.grid(row=0, column=1, sticky="w", padx=(6, 12))
+        self.project_combo.bind("<<ComboboxSelected>>", lambda _e: self._on_project_selected())
+
+        ttk.Button(bar, text="New", command=self._new_project).grid(row=0, column=2, sticky="w")
+        ttk.Button(bar, text="Delete", command=self._delete_project).grid(row=0, column=3, sticky="w", padx=(6, 12))
+
+        ttk.Label(bar, text="ΔT (K):").grid(row=0, column=4, sticky="w")
+        self.delta_t_var = tk.StringVar(value="20")
+        ttk.Entry(bar, textvariable=self.delta_t_var, width=8).grid(row=0, column=5, sticky="w", padx=(6, 12))
+        ttk.Button(bar, text="Save ΔT", command=self._save_delta_t).grid(row=0, column=6, sticky="w")
+
+        ttk.Button(bar, text="Export JSON", command=self._export_json).grid(row=0, column=7, sticky="w", padx=(18, 6))
+        ttk.Button(bar, text="Export CSV", command=self._export_csv).grid(row=0, column=8, sticky="w")
+
+    def _build_body(self) -> None:
+        paned = ttk.PanedWindow(self, orient=tk.HORIZONTAL)
+        paned.grid(row=1, column=0, sticky="nsew")
+
+        left = ttk.Frame(paned)
+        right = ttk.Frame(paned)
+        left.columnconfigure(0, weight=1)
+        left.rowconfigure(1, weight=1)
+        right.columnconfigure(0, weight=1)
+        right.rowconfigure(2, weight=1)
+
+        paned.add(left, weight=1)
+        paned.add(right, weight=3)
+
+        room_head = ttk.Frame(left)
+        room_head.grid(row=0, column=0, sticky="ew", pady=(0, 6))
+        ttk.Label(room_head, text="Rooms", font=("Segoe UI", 11, "bold")).grid(row=0, column=0, sticky="w")
+        ttk.Button(room_head, text="Add", command=self._add_room).grid(row=0, column=1, sticky="e", padx=(6, 0))
+        ttk.Button(room_head, text="Edit", command=self._edit_room).grid(row=0, column=2, sticky="e", padx=(6, 0))
+        ttk.Button(room_head, text="Delete", command=self._delete_room).grid(row=0, column=3, sticky="e", padx=(6, 0))
+        room_head.columnconfigure(0, weight=1)
+
+        self.room_list = tk.Listbox(left, height=10)
+        self.room_list.grid(row=1, column=0, sticky="nsew")
+        self.room_list.bind("<<ListboxSelect>>", lambda _e: self._on_room_selected())
+
+        top = ttk.Frame(right)
+        top.grid(row=0, column=0, sticky="ew", pady=(0, 10))
+        top.columnconfigure(6, weight=1)
+
+        ttk.Label(top, text="Selected room:").grid(row=0, column=0, sticky="w")
+        self.room_name_var = tk.StringVar(value="")
+        ttk.Label(top, textvariable=self.room_name_var, font=("Segoe UI", 10, "bold")).grid(row=0, column=1, sticky="w", padx=(6, 12))
+
+        ttk.Label(top, text="Volume (m³):").grid(row=0, column=2, sticky="w")
+        self.room_volume_var = tk.StringVar(value="")
+        ttk.Entry(top, textvariable=self.room_volume_var, width=10).grid(row=0, column=3, sticky="w", padx=(6, 12))
+
+        ttk.Label(top, text="ACH:").grid(row=0, column=4, sticky="w")
+        self.room_ach_var = tk.StringVar(value="")
+        ttk.Entry(top, textvariable=self.room_ach_var, width=10).grid(row=0, column=5, sticky="w", padx=(6, 12))
+
+        ttk.Button(top, text="Save room", command=self._save_room_quick).grid(row=0, column=6, sticky="w")
+
+        totals = ttk.Frame(right)
+        totals.grid(row=1, column=0, sticky="ew", pady=(0, 10))
+        totals.columnconfigure(0, weight=1)
+        self.total_var = tk.StringVar(value="")
+        ttk.Label(totals, textvariable=self.total_var).grid(row=0, column=0, sticky="w")
+
+        surf_head = ttk.Frame(right)
+        surf_head.grid(row=2, column=0, sticky="ew", pady=(0, 6))
+        surf_head.columnconfigure(0, weight=1)
+        ttk.Label(surf_head, text="Surfaces", font=("Segoe UI", 11, "bold")).grid(row=0, column=0, sticky="w")
+        ttk.Button(surf_head, text="Add", command=self._add_surface).grid(row=0, column=1, sticky="e", padx=(6, 0))
+        ttk.Button(surf_head, text="Edit", command=self._edit_surface).grid(row=0, column=2, sticky="e", padx=(6, 0))
+        ttk.Button(surf_head, text="Delete", command=self._delete_surface).grid(row=0, column=3, sticky="e", padx=(6, 0))
+
+        cols = ("kind", "name", "area_m2", "u_value")
+        self.surface_tree = ttk.Treeview(right, columns=cols, show="headings", height=12)
+        self.surface_tree.heading("kind", text="Type")
+        self.surface_tree.heading("name", text="Name")
+        self.surface_tree.heading("area_m2", text="Area (m²)")
+        self.surface_tree.heading("u_value", text="U (W/m²K)")
+        self.surface_tree.column("kind", width=110, anchor="w")
+        self.surface_tree.column("name", width=240, anchor="w")
+        self.surface_tree.column("area_m2", width=120, anchor="e")
+        self.surface_tree.column("u_value", width=120, anchor="e")
+        self.surface_tree.grid(row=3, column=0, sticky="nsew")
+        right.rowconfigure(3, weight=1)
+
+        y = ttk.Scrollbar(right, orient="vertical", command=self.surface_tree.yview)
+        self.surface_tree.configure(yscrollcommand=y.set)
+        y.grid(row=3, column=1, sticky="ns")
+
+    def _refresh_all(self) -> None:
+        self.projects = db.list_projects(self.conn)
+        self.project_combo["values"] = [p.name for p in self.projects]
+
+        if not self.projects:
+            self.project_var.set("")
+            self.delta_t_var.set("20")
+            self.rooms = []
+            self._render_rooms()
+            self._clear_room_detail()
+            return
+
+        if self.project_var.get() not in {p.name for p in self.projects}:
+            self.project_var.set(self.projects[0].name)
+
+        self._on_project_selected()
+
+    def _on_project_selected(self) -> None:
+        proj = self._selected_project()
+        if not proj:
+            return
+        self.delta_t_var.set(str(proj.delta_t_k))
+        self.rooms = db.list_rooms(self.conn, proj.id)
+        self._render_rooms()
+        if self.rooms:
+            self.room_list.selection_set(0)
+            self._on_room_selected()
+        else:
+            self._clear_room_detail()
+
+    def _render_rooms(self) -> None:
+        self.room_list.delete(0, tk.END)
+        for r in self.rooms:
+            self.room_list.insert(tk.END, r.name)
+
+    def _on_room_selected(self) -> None:
+        room = self._selected_room()
+        if not room:
+            self._clear_room_detail()
+            return
+
+        self.room_name_var.set(room.name)
+        self.room_volume_var.set(str(room.volume_m3))
+        self.room_ach_var.set(str(room.ach))
+
+        self.surfaces = db.list_surfaces(self.conn, room.id)
+        self._render_surfaces()
+        self._render_totals()
+
+    def _render_surfaces(self) -> None:
+        for item in self.surface_tree.get_children():
+            self.surface_tree.delete(item)
+        for s in self.surfaces:
+            self.surface_tree.insert(
+                "",
+                "end",
+                iid=str(s.id),
+                values=(s.kind, s.name, f"{s.area_m2:.3f}", f"{s.u_value_w_m2k:.3f}"),
+            )
+
+    def _render_totals(self) -> None:
+        room = self._selected_room()
+        proj = self._selected_project()
+        if not room or not proj:
+            self.total_var.set("")
+            return
+
+        calc_room = CalcRoom(name=room.name, volume_m3=room.volume_m3, ach=room.ach)
+        calc_surfaces = [
+            CalcSurface(name=s.name, kind=s.kind, area_m2=s.area_m2, u_value_w_m2k=s.u_value_w_m2k)
+            for s in self.surfaces
+        ]
+        q_cond, q_vent, q_total = room_heat_loss_w(calc_room, calc_surfaces, proj.delta_t_k)
+        self.total_var.set(
+            f"Conduction: {q_cond:.1f} W    Ventilation: {q_vent:.1f} W    Total: {q_total:.1f} W"
+        )
+
+    def _clear_room_detail(self) -> None:
+        self.room_name_var.set("")
+        self.room_volume_var.set("")
+        self.room_ach_var.set("")
+        self.total_var.set("")
+        for item in self.surface_tree.get_children():
+            self.surface_tree.delete(item)
+
+    def _selected_project(self) -> Project | None:
+        name = self.project_var.get().strip()
+        for p in self.projects:
+            if p.name == name:
+                return p
+        return None
+
+    def _selected_room(self) -> Room | None:
+        sel = self.room_list.curselection()
+        if not sel:
+            return None
+        idx = sel[0]
+        if idx < 0 or idx >= len(self.rooms):
+            return None
+        return self.rooms[idx]
+
+    def _selected_surface(self) -> Surface | None:
+        sel = self.surface_tree.selection()
+        if not sel:
+            return None
+        sid = int(sel[0])
+        for s in self.surfaces:
+            if s.id == sid:
+                return s
+        return None
+
+    def _new_project(self) -> None:
+        name = simpledialog.askstring("New project", "Project name:", parent=self)
+        if not name:
+            return
+        name = name.strip()
+
+        delta_raw = simpledialog.askstring("ΔT", "Default ΔT (K):", initialvalue="20", parent=self)
+        if delta_raw is None:
+            return
+
+        try:
+            dt = _float_or_error(delta_raw, "ΔT")
+            _validate_positive(dt, "ΔT")
+            db.create_project(self.conn, name, dt)
+        except Exception as e:
+            messagebox.showerror("Error", str(e), parent=self)
+            return
+
+        self.project_var.set(name)
+        self._refresh_all()
+
+    def _delete_project(self) -> None:
+        proj = self._selected_project()
+        if not proj:
+            return
+        if not messagebox.askyesno("Delete project", f"Delete project '{proj.name}'?", parent=self):
+            return
+        db.delete_project(self.conn, proj.id)
+        self._refresh_all()
+
+    def _save_delta_t(self) -> None:
+        proj = self._selected_project()
+        if not proj:
+            return
+        try:
+            dt = _float_or_error(self.delta_t_var.get(), "ΔT")
+            _validate_positive(dt, "ΔT")
+            db.update_project_delta_t(self.conn, proj.id, dt)
+            self._refresh_all()
+        except Exception as e:
+            messagebox.showerror("Invalid input", str(e), parent=self)
+
+    def _add_room(self) -> None:
+        proj = self._selected_project()
+        if not proj:
+            messagebox.showinfo("No project", "Create a project first.", parent=self)
+            return
+
+        name = simpledialog.askstring("New room", "Room name:", parent=self)
+        if not name:
+            return
+
+        vol_raw = simpledialog.askstring("Volume", "Volume (m³):", initialvalue="50", parent=self)
+        if vol_raw is None:
+            return
+
+        ach_raw = simpledialog.askstring("ACH", "ACH:", initialvalue="0.5", parent=self)
+        if ach_raw is None:
+            return
+
+        try:
+            vol = _float_or_error(vol_raw, "Volume")
+            _validate_positive(vol, "Volume")
+            ach = _float_or_error(ach_raw, "ACH")
+            if ach < 0:
+                raise ValueError("ACH must be >= 0")
+            db.create_room(self.conn, proj.id, name.strip(), vol, ach)
+        except Exception as e:
+            messagebox.showerror("Error", str(e), parent=self)
+            return
+
+        self._on_project_selected()
+
+    def _edit_room(self) -> None:
+        room = self._selected_room()
+        if not room:
+            return
+
+        name = simpledialog.askstring("Edit room", "Room name:", initialvalue=room.name, parent=self)
+        if not name:
+            return
+
+        vol_raw = simpledialog.askstring("Edit room", "Volume (m³):", initialvalue=str(room.volume_m3), parent=self)
+        if vol_raw is None:
+            return
+
+        ach_raw = simpledialog.askstring("Edit room", "ACH:", initialvalue=str(room.ach), parent=self)
+        if ach_raw is None:
+            return
+
+        try:
+            vol = _float_or_error(vol_raw, "Volume")
+            _validate_positive(vol, "Volume")
+            ach = _float_or_error(ach_raw, "ACH")
+            if ach < 0:
+                raise ValueError("ACH must be >= 0")
+            db.update_room(self.conn, room.id, name.strip(), vol, ach)
+        except Exception as e:
+            messagebox.showerror("Error", str(e), parent=self)
+            return
+
+        self._on_project_selected()
+
+    def _save_room_quick(self) -> None:
+        room = self._selected_room()
+        if not room:
+            return
+
+        try:
+            vol = _float_or_error(self.room_volume_var.get(), "Volume")
+            _validate_positive(vol, "Volume")
+            ach = _float_or_error(self.room_ach_var.get(), "ACH")
+            if ach < 0:
+                raise ValueError("ACH must be >= 0")
+
+            db.update_room(self.conn, room.id, room.name, vol, ach)
+            self._on_project_selected()
+        except Exception as e:
+            messagebox.showerror("Invalid input", str(e), parent=self)
+
+    def _delete_room(self) -> None:
+        room = self._selected_room()
+        if not room:
+            return
+        if not messagebox.askyesno("Delete room", f"Delete room '{room.name}'?", parent=self):
+            return
+        db.delete_room(self.conn, room.id)
+        self._on_project_selected()
+
+    def _surface_dialog(self, title: str, existing: Surface | None = None) -> tuple[str, str, float, float] | None:
+        kind = simpledialog.askstring(
+            title,
+            f"Type ({', '.join(KINDS)}):",
+            initialvalue=(existing.kind if existing else "wall"),
+            parent=self,
+        )
+        if kind is None:
+            return None
+        kind = kind.strip().lower() or "wall"
+
+        name = simpledialog.askstring(
+            title,
+            "Name (e.g. North wall):",
+            initialvalue=(existing.name if existing else ""),
+            parent=self,
+        )
+        if not name:
+            return None
+
+        area_raw = simpledialog.askstring(
+            title,
+            "Area (m²):",
+            initialvalue=(str(existing.area_m2) if existing else "10"),
+            parent=self,
+        )
+        if area_raw is None:
+            return None
+
+        u_raw = simpledialog.askstring(
+            title,
+            "U-value (W/m²K):",
+            initialvalue=(str(existing.u_value_w_m2k) if existing else "0.3"),
+            parent=self,
+        )
+        if u_raw is None:
+            return None
+
+        area = _float_or_error(area_raw, "Area")
+        _validate_positive(area, "Area")
+        u = _float_or_error(u_raw, "U-value")
+        _validate_positive(u, "U-value")
+
+        return kind, name.strip(), area, u
+
+    def _add_surface(self) -> None:
+        room = self._selected_room()
+        if not room:
+            messagebox.showinfo("No room", "Select or create a room first.", parent=self)
+            return
+        try:
+            result = self._surface_dialog("Add surface")
+            if not result:
+                return
+            kind, name, area, u = result
+            db.create_surface(self.conn, room.id, kind, name, area, u)
+            self._on_room_selected()
+        except Exception as e:
+            messagebox.showerror("Error", str(e), parent=self)
+
+    def _edit_surface(self) -> None:
+        s = self._selected_surface()
+        if not s:
+            return
+        try:
+            result = self._surface_dialog("Edit surface", existing=s)
+            if not result:
+                return
+            kind, name, area, u = result
+            db.update_surface(self.conn, s.id, kind, name, area, u)
+            self._on_room_selected()
+        except Exception as e:
+            messagebox.showerror("Error", str(e), parent=self)
+
+    def _delete_surface(self) -> None:
+        s = self._selected_surface()
+        if not s:
+            return
+        if not messagebox.askyesno("Delete surface", f"Delete '{s.name}'?", parent=self):
+            return
+        db.delete_surface(self.conn, s.id)
+        self._on_room_selected()
+
+    def _export_json(self) -> None:
+        proj = self._selected_project()
+        if not proj:
+            return
+        path = filedialog.asksaveasfilename(
+            title="Export JSON",
+            defaultextension=".json",
+            filetypes=[("JSON", "*.json")],
+        )
+        if not path:
+            return
+
+        payload = {
+            "project": asdict(proj),
+            "rooms": [asdict(r) for r in self.rooms],
+            "surfaces": [asdict(s) for r in self.rooms for s in db.list_surfaces(self.conn, r.id)],
+        }
+        Path(path).write_text(json.dumps(payload, indent=2), encoding="utf-8")
+        messagebox.showinfo("Export", f"Wrote {path}", parent=self)
+
+    def _export_csv(self) -> None:
+        proj = self._selected_project()
+        if not proj:
+            return
+        path = filedialog.asksaveasfilename(
+            title="Export CSV",
+            defaultextension=".csv",
+            filetypes=[("CSV", "*.csv")],
+        )
+        if not path:
+            return
+
+        out = Path(path)
+        with out.open("w", encoding="utf-8", newline="") as f:
+            w = csv.writer(f)
+            w.writerow(["project", "delta_t_k", "room", "volume_m3", "ach", "q_cond_w", "q_vent_w", "q_total_w"])
+            for room in self.rooms:
+                surfaces = db.list_surfaces(self.conn, room.id)
+                calc_room = CalcRoom(name=room.name, volume_m3=room.volume_m3, ach=room.ach)
+                calc_surfaces = [
+                    CalcSurface(name=s.name, kind=s.kind, area_m2=s.area_m2, u_value_w_m2k=s.u_value_w_m2k)
+                    for s in surfaces
+                ]
+                q_cond, q_vent, q_total = room_heat_loss_w(calc_room, calc_surfaces, proj.delta_t_k)
+                w.writerow([proj.name, proj.delta_t_k, room.name, room.volume_m3, room.ach, q_cond, q_vent, q_total])
+
+        messagebox.showinfo("Export", f"Wrote {out}", parent=self)
+
+
+def run(db_path: Path) -> None:
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
+    root = tk.Tk()
+    root.option_add("*tearOff", False)
+    ttk.Style().theme_use("clam")
+    HeatLossApp(root, db_path=db_path)
+    root.mainloop()
+```
+
+**File: `examples/heat_loss_app/tests/test_calc.py`**
+
+```python
+import unittest
+
+from examples.heat_loss_app.calc import Room, Surface, conduction_heat_loss_w, room_heat_loss_w, ventilation_heat_loss_w
+
+
+class TestCalc(unittest.TestCase):
+    def test_conduction(self) -> None:
+        surfaces = [Surface(name="Wall", kind="wall", area_m2=10.0, u_value_w_m2k=0.3)]
+        self.assertAlmostEqual(conduction_heat_loss_w(surfaces, 20), 60.0)
+
+    def test_ventilation(self) -> None:
+        self.assertAlmostEqual(ventilation_heat_loss_w(50, 0.5, 20), 165.0)
+
+    def test_room_total(self) -> None:
+        room = Room(name="Room", volume_m3=50, ach=0.5)
+        surfaces = [Surface(name="Wall", kind="wall", area_m2=10.0, u_value_w_m2k=0.3)]
+        q_cond, q_vent, q_total = room_heat_loss_w(room, surfaces, 20)
+        self.assertAlmostEqual(q_cond, 60.0)
+        self.assertAlmostEqual(q_vent, 165.0)
+        self.assertAlmostEqual(q_total, 225.0)
+
+
+if __name__ == "__main__":
+    unittest.main()
+```
+
+---
+
+### Advanced project 2: Async chat server + client (asyncio)
+
+**Goal:** Learn asynchronous I/O in a real, interactive way.
+
+**Solution (minimal):**
+
+```python
+import asyncio
+
+
+async def handle_client(reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:
+    addr = writer.get_extra_info("peername")
+    writer.write(b"Welcome! Type messages.\n")
+    await writer.drain()
+    while True:
+        line = await reader.readline()
+        if not line:
+            break
+        writer.write(b"echo: " + line)
+        await writer.drain()
+    writer.close()
+    await writer.wait_closed()
+    print("Disconnected", addr)
+
+
+async def main() -> None:
+    server = await asyncio.start_server(handle_client, "127.0.0.1", 7777)
+    addrs = ", ".join(str(sock.getsockname()) for sock in server.sockets or [])
+    print("Serving on", addrs)
+    async with server:
+        await server.serve_forever()
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+Client:
+
+```python
+import asyncio
+
+
+async def main() -> None:
+    reader, writer = await asyncio.open_connection("127.0.0.1", 7777)
+    print((await reader.readline()).decode().strip())
+
+    while True:
+        msg = input("> ")
+        if msg.strip().lower() in {"quit", "exit"}:
+            break
+        writer.write((msg + "\n").encode())
+        await writer.drain()
+        print((await reader.readline()).decode().strip())
+
+    writer.close()
+    await writer.wait_closed()
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+---
+
+### Advanced project 3: Plugin-based CLI tool skeleton
+
+**Goal:** Learn how bigger codebases stay clean: subcommands + plugins.
+
+**Spec:**
+- `tool.py run <plugin> ...`
+- Plugins live in `plugins/` and expose a `register(subparsers)` function.
+- Config loaded from `pyproject.toml`-like file via `tomllib`.
+
+**Solution (skeleton):**
+
+```python
+from __future__ import annotations
+
+import argparse
+import importlib
+import logging
+import tomllib
+from pathlib import Path
+
+
+def load_config(path: Path) -> dict:
+    if not path.exists():
+        return {}
+    return tomllib.loads(path.read_text(encoding="utf-8"))
+
+
+def build_parser() -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(prog="tool")
+    sub = p.add_subparsers(dest="cmd", required=True)
+
+    run = sub.add_parser("run")
+    run.add_argument("plugin")
+    run.add_argument("args", nargs=argparse.REMAINDER)
+    return p
+
+
+def main() -> None:
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
+    args = build_parser().parse_args()
+    config = load_config(Path("tool.toml"))
+    logging.info("Loaded config keys: %s", sorted(config.keys()))
+
+    if args.cmd == "run":
+        mod = importlib.import_module(f"plugins.{args.plugin}")
+        if not hasattr(mod, "main"):
+            raise SystemExit("Plugin must define main(argv: list[str])")
+        mod.main(args.args)
+
+
+if __name__ == "__main__":
+    main()
+```
+
+Example plugin `plugins/hello.py`:
+
+```python
+def main(argv: list[str]) -> None:
+    name = argv[0] if argv else "world"
+    print(f"Hello, {name}!")
+```
+
 ---
 
 ## Recipes & Quick-Reference Cheatsheets
@@ -12395,12 +15076,13 @@ name = "my-app"
 version = "1.0.0"
 
 [project.dependencies]
-requests = ">=2.28"
+# Third-party deps would go here, for example:
+# somepackage = ">=1.2"
 '''
 
 config = tomllib.loads(toml_str)
 print(config["project"]["name"])          # my-app
-print(config["project"]["dependencies"])  # {'requests': '>=2.28'}
+print(config["project"]["dependencies"])  # {}
 ```
 
 ---
@@ -12581,32 +15263,7 @@ req = urllib.request.Request("https://httpbin.org/post", data=data)
 #     print(response.read().decode())
 ```
 
-**`requests` library (pip install requests):**
-
-```python
-import requests
-
-# GET
-resp = requests.get("https://api.github.com/users/octocat")
-print(resp.status_code)    # 200
-data = resp.json()
-
-# POST with JSON
-resp = requests.post("https://httpbin.org/post", json={"key": "value"})
-
-# With headers and timeout
-resp = requests.get(
-    "https://api.example.com/data",
-    headers={"Authorization": "Bearer token123"},
-    timeout=10,
-)
-
-# Download a file
-resp = requests.get("https://example.com/file.zip", stream=True)
-with open("file.zip", "wb") as f:
-    for chunk in resp.iter_content(chunk_size=8192):
-        f.write(chunk)
-```
+**Note:** Many projects use the third-party `requests` library for a friendlier HTTP API, but this guide sticks to `urllib.request` to remain standard-library-only.
 
 ---
 
@@ -12911,7 +15568,7 @@ def process(items: list[str]) -> dict[str, int]:
 
 ## What’s New in Python 3.14
 
-Python 3.14 (expected final release: **October 2025**) introduces several notable changes. Below is a summary of confirmed and proposed features.
+Python 3.14 was released on **7 October 2025** and introduces several notable changes. Below is a brief highlight reel; for the full, canonical list see the official “What’s New in Python 3.14”.
 
 ---
 
@@ -12986,12 +15643,12 @@ Python continues to improve its error messages, building on the detailed traceba
 
 ```bash
 # Install via pyenv (recommended)
-pyenv install 3.14.0a5
-pyenv local 3.14.0a5
+pyenv install 3.14.1
+pyenv local 3.14.1
 
 # Or download from python.org/downloads/
 # Or use Docker
-docker run -it python:3.14-rc python
+docker run -it python:3.14 python
 ```
 
 ---
@@ -13013,7 +15670,9 @@ docker run -it python:3.14-rc python
 - **Fluent Python (2nd ed):** deep dive into Python's data model
 - **Effective Python (Brett Slatkin):** 90 specific ways to write better Python
 
-### Tools
+### Optional tools (third-party)
+
+These tools are widely used in real projects, but they’re **not required** for the standard-library-only examples in this guide.
 
 - **mypy:** https://mypy.readthedocs.io/ — static type checker
 - **ruff:** https://docs.astral.sh/ruff/ — fast Python linter and formatter

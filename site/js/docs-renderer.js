@@ -106,6 +106,21 @@
       .replace(/"/g, '&quot;');
   }
 
+  function normalizeFenceLang(lang) {
+    const raw = (lang || '').toString().trim().toLowerCase();
+    if (!raw) return '';
+    const map = {
+      py: 'python',
+      sh: 'bash',
+      shell: 'bash',
+      zsh: 'bash',
+      js: 'javascript',
+      plaintext: 'text',
+      txt: 'text',
+    };
+    return map[raw] || raw;
+  }
+
   function shouldShowHtmlOutput(source) {
     const html = (source || '').toString();
     if (!html.trim()) return false;
@@ -148,7 +163,7 @@
   renderer.code = function (code, lang) {
     let text = typeof code === 'object' ? code.text : code;
     let language = typeof code === 'object' ? code.lang : lang;
-    language = (language || '').toString().trim().toLowerCase();
+    language = normalizeFenceLang((language || '').toString().trim().toLowerCase());
 
     // CTk widget preview — render raw HTML inside a styled wrapper
     if (language === 'ctk-preview') {
@@ -162,6 +177,7 @@
       const escaped = escapeHtml(text);
       const showOutput = shouldShowHtmlOutput(text);
       const encodedAttr = showOutput ? ` data-html-src="${encodeURIComponent(text)}"` : '';
+      const langAttr = ` data-lang="html"`;
       const outputHtml = showOutput
         ? `
   <div class="html-live-output">
@@ -174,13 +190,38 @@
 
       return `
 <div class="html-live-wrap${showOutput ? '' : ' html-live-no-output'}">
-  <pre><code class="hljs language-html"${encodedAttr}>${escaped}</code></pre>${outputHtml}
+  <pre><code class="hljs language-html"${langAttr}${encodedAttr}>${escaped}</code></pre>${outputHtml}
 </div>\n`;
     }
 
-    const langClass = language ? `language-${language}` : '';
+    // Output blocks — render a titled panel for example output.
+    // Usage in Markdown:
+    // ```output
+    // hello
+    // ```
+    // Also supports: console, stdout, stderr, terminal
+    if (['output', 'console', 'terminal', 'stdout', 'stderr'].includes(language)) {
+      const escaped = escapeHtml(text);
+      const kind = language;
+      const label = kind === 'stderr'
+        ? 'Error output'
+        : (kind === 'stdout' ? 'Output' : (kind === 'terminal' ? 'Terminal' : (kind === 'console' ? 'Console' : 'Output')));
+
+      // Use plaintext highlighting to avoid accidental syntax coloring.
+      return `
+<div class="code-output-wrap code-output-${kind}">
+  <div class="code-output-toolbar"><span class="code-output-label">${label}</span></div>
+  <pre><code class="hljs language-text">${escaped}</code></pre>
+</div>\n`;
+    }
+
+    // For unlabeled fences, force plaintext so Highlight.js won't auto-detect a random language.
+    const isExplicit = Boolean(language) && !['text'].includes(language);
+    const renderLang = isExplicit ? language : 'text';
+    const langClass = `language-${renderLang}`;
+    const langAttr = isExplicit ? ` data-lang="${renderLang}"` : '';
     const escaped = escapeHtml(text);
-    return `<pre><code class="hljs ${langClass}">${escaped}</code></pre>\n`;
+    return `<pre><code class="hljs ${langClass}"${langAttr}>${escaped}</code></pre>\n`;
   };
 
   content.innerHTML = marked.parse(md, { gfm: true, breaks: true, renderer: renderer });
@@ -295,14 +336,13 @@
     pre.style.position = 'relative';
     const codeEl = pre.querySelector('code');
 
-    // Language label
+    // Language label (only show when the Markdown fence explicitly set a language)
     if (codeEl) {
-      const cls = [...codeEl.classList].find(c => c.startsWith('language-'));
-      if (cls) {
-        const lang = cls.replace('language-', '');
+      const explicitLang = (codeEl.dataset.lang || '').trim();
+      if (explicitLang) {
         const label = document.createElement('span');
         label.className = 'code-lang-label';
-        label.textContent = lang;
+        label.textContent = explicitLang;
         pre.appendChild(label);
       }
     }
@@ -324,24 +364,7 @@
     pre.appendChild(btn);
   });
 
-  // ===== 6. Heading anchor links =====
-  $$('h1,h2,h3,h4', content).forEach(h => {
-    if (!h.id) return;
-    const anchor = document.createElement('a');
-    anchor.className = 'heading-anchor';
-    anchor.href = '#' + h.id;
-    anchor.textContent = '#';
-    anchor.title = 'Copy link to section';
-    anchor.addEventListener('click', (e) => {
-      e.preventDefault();
-      history.replaceState(null, '', '#' + h.id);
-      h.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      navigator.clipboard.writeText(window.location.href).catch(() => {});
-    });
-    h.prepend(anchor);
-  });
-
-  // ===== 7. Build TOC (with collapsible sub-headings) =====
+  // ===== 6. Build TOC (with collapsible sub-headings) =====
   const headings = $$('h1,h2,h3,h4', content);
   const idCount = {};
   let groupId = 0;
@@ -398,6 +421,26 @@
     });
 
     toc.appendChild(a);
+  });
+
+  // ===== 7. Heading anchor links =====
+  // Note: IDs are assigned above, so anchors work reliably.
+  headings.forEach(h => {
+    if (!h.id) return;
+    if (h.querySelector(':scope > a.heading-anchor')) return;
+
+    const anchor = document.createElement('a');
+    anchor.className = 'heading-anchor';
+    anchor.href = '#' + h.id;
+    anchor.textContent = '#';
+    anchor.title = 'Copy link to section';
+    anchor.addEventListener('click', (e) => {
+      e.preventDefault();
+      history.replaceState(null, '', '#' + h.id);
+      h.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      navigator.clipboard.writeText(window.location.href).catch(() => {});
+    });
+    h.prepend(anchor);
   });
 
   // ===== 8. TOC search / filter =====

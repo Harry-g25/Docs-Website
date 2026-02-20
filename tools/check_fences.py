@@ -7,7 +7,7 @@ Useful for catching formatting errors before publishing.
 
 Usage:
     python tools/check_fences.py <markdown-file>
-    python tools/check_fences.py content/python-3.14.md
+    python tools/check_fences.py site/content/python-3.14.md
 """
 
 import os
@@ -41,8 +41,17 @@ def check_fences(filepath: str) -> list[tuple[int, str]]:
 
 def main():
     if len(sys.argv) < 2:
-        # Default: check all .md files in content/
+        # Default: check all .md files in the docs content directory.
+        # Historical layouts used ROOT/content; current layout uses ROOT/site/content.
         content_dir = os.path.join(ROOT, "content")
+        if not os.path.isdir(content_dir):
+            content_dir = os.path.join(ROOT, "site", "content")
+        if not os.path.isdir(content_dir):
+            print(
+                "Could not find a docs content directory. Expected either 'content/' or 'site/content/' at repo root.",
+                file=sys.stderr,
+            )
+            sys.exit(1)
         files = sorted(
             os.path.join(content_dir, f)
             for f in os.listdir(content_dir)

@@ -87,8 +87,28 @@
     let currentLevel = 0;
     let buffer = [];
     const idCount = {};
+    let inCodeFence = false;
+    let codeFenceMarker = '';
 
     for (const line of lines) {
+      const trimmed = line.trim();
+
+      // Skip fenced code blocks entirely so search results are about prose + headings,
+      // not random identifiers from examples.
+      const fenceMatch = trimmed.match(/^(```|~~~)/);
+      if (fenceMatch) {
+        const marker = fenceMatch[1];
+        if (!inCodeFence) {
+          inCodeFence = true;
+          codeFenceMarker = marker;
+        } else if (codeFenceMarker === marker) {
+          inCodeFence = false;
+          codeFenceMarker = '';
+        }
+        continue;
+      }
+      if (inCodeFence) continue;
+
       const headingMatch = line.match(/^(#{1,4})\s+(.+)/);
       if (headingMatch) {
         // Flush previous section
@@ -121,7 +141,7 @@
           .replace(/^>\s?/, '')          // blockquote
           .replace(/^\s*[-*+]\s/, '')    // list items
           .replace(/^\s*\d+\.\s/, '')    // numbered lists
-          .replace(/```[\s\S]*?```/g, '') // inline code blocks
+          .replace(/```[\s\S]*?```/g, '') // inline code blocks (single-line)
           .replace(/`[^`]+`/g, '')       // inline code
           .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // links
           .replace(/[*_~]/g, '')         // emphasis
