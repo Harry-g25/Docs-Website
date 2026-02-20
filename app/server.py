@@ -45,11 +45,16 @@ class _LoggingHandler(http.server.SimpleHTTPRequestHandler):
             super().log_message(fmt, *args)
 
 
+class _ReusableTCPServer(socketserver.TCPServer):
+    # Helps with quick restart after Ctrl+C on some platforms.
+    allow_reuse_address = True
+
+
 # ── Server functions ─────────────────────────────────────────────
 
 def start_background_server(port: int):
     """Start a silent HTTP server on *port* in a daemon thread."""
-    httpd = socketserver.TCPServer(("127.0.0.1", port), _QuietHandler)
+    httpd = _ReusableTCPServer(("127.0.0.1", port), _QuietHandler)
     t = threading.Thread(target=httpd.serve_forever, daemon=True)
     t.start()
     return httpd
@@ -57,16 +62,31 @@ def start_background_server(port: int):
 
 def run_foreground_server(port: int = 8000, open_browser: bool = True):
     """Run a foreground HTTP server (blocking) and optionally open the browser."""
-    url = f"http://localhost:{port}/site/index.html"
+    requested_port = port
+    chosen_port = port
 
-    with socketserver.TCPServer(("", port), _LoggingHandler) as httpd:
-        print(f"  Serving docs at  {url}")
-        print(f"  Press Ctrl+C to stop.\n")
-
-        if open_browser:
-            threading.Timer(0.4, lambda: webbrowser.open(url)).start()
-
+    while True:
+        url = f"http://localhost:{chosen_port}/site/index.html"
         try:
-            httpd.serve_forever()
-        except KeyboardInterrupt:
-            print("\n  Server stopped.")
+            with _ReusableTCPServer(("127.0.0.1", chosen_port), _LoggingHandler) as httpd:
+                if requested_port != chosen_port:
+                    print(
+                        f"  Port {requested_port} is busy; using {chosen_port} instead."
+                    )
+                print(f"  Serving docs at  {url}")
+                print("  Press Ctrl+C to stop.\n")
+
+                if open_browser:
+                    threading.Timer(0.4, lambda: webbrowser.open(url)).start()
+
+                try:
+                    httpd.serve_forever()
+                except KeyboardInterrupt:
+                    print("\n  Server stopped.")
+                return
+        except OSError as e:
+            # WinError 10048: only one usage of each socket address is normally permitted.
+            if getattr(e, "winerror", None) == 10048 or e.errno in {48, 98}:
+                chosen_port = find_free_port()
+                continue
+            raise

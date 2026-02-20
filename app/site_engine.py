@@ -395,6 +395,14 @@ def register_in_search(slug: str, title: str, color1: str) -> bool:
         return False
 
     doc_id = slug.replace("-", "")
+    # Idempotency: if this doc is already registered, do nothing.
+    if re.search(rf"\\bid\\s*:\\s*'{re.escape(doc_id)}'", js):
+        return True
+    if re.search(rf"\\bmdPath\\s*:\\s*'content/{re.escape(slug)}\\.md'", js):
+        return True
+    if re.search(rf"\\bhtmlPage\\s*:\\s*'pages/{re.escape(slug)}\\.html'", js):
+        return True
+
     new_entry = textwrap.dedent(f"""\
     {{
       id: '{doc_id}',

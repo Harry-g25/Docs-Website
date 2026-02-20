@@ -43,6 +43,13 @@
   htmlPage: 'pages/css-complete-reference-practical-guide.html',
   color: '#264de4',
 },
+      {
+  id: 'markdownlanguage',
+  title: 'Markdown Language',
+  mdPath: 'content/markdown-language.md',
+  htmlPage: 'pages/markdown-language.html',
+  color: '#06b6d4',
+},
   ];
 
   const assetVersion = (window.__ASSET_VERSION || '').toString().trim();
